@@ -1,443 +1,1273 @@
-import type { CourseChapter, LearningResource } from '../types/course'
+import type {
+  CodeBlock,
+  CourseChapter,
+  CourseDocSection,
+  CourseExercise,
+  LearningPhaseMeta,
+  LearningResource,
+} from '../types/course'
+
+function createCode(title: string, lang: string, content: string): CodeBlock {
+  return { title, lang, content }
+}
+
+function createDocSection(
+  title: string,
+  paragraphs: string[],
+  bullets?: string[],
+  code?: CodeBlock[],
+): CourseDocSection {
+  return { title, paragraphs, bullets, code }
+}
+
+function createExercise(
+  id: string,
+  title: string,
+  intro: string,
+  files: string[],
+  steps: string[],
+  verify: string[],
+): CourseExercise {
+  return { id, title, intro, files, steps, verify }
+}
+
+export const learningPhases: LearningPhaseMeta[] = [
+  {
+    id: 'foundations',
+    title: '基础入门',
+    focus: '先把浏览器、JavaScript、TypeScript 和 Vue 响应式串起来',
+    description: '适合从 Python 后端转前端的人，重点不是背 API，而是建立页面如何响应状态变化的直觉。',
+    chapterRange: 'Chapter 1-4',
+  },
+  {
+    id: 'core',
+    title: '核心机制',
+    focus: '把组件拆分、逻辑复用、表单处理做扎实',
+    description: '从能写页面，提升到能组织一个中小型 Vue 应用，开始形成模块边界和工程习惯。',
+    chapterRange: 'Chapter 5-8',
+  },
+  {
+    id: 'architecture',
+    title: '应用架构',
+    focus: '进入路由、状态管理、异步数据和类型体系',
+    description: '这一阶段不再停留在 demo，而是开始接近真实业务系统的页面结构和数据流。',
+    chapterRange: 'Chapter 9-11',
+  },
+  {
+    id: 'production',
+    title: '生产落地',
+    focus: '补齐样式工程、性能、测试和项目交付',
+    description: '目标是做出可以展示、可以复盘、可以继续演进的前端项目，而不是只停留在教程练习。',
+    chapterRange: 'Chapter 12-14',
+  },
+]
 
 export const courseChapters: CourseChapter[] = [
   {
     id: 'chapter-1',
     order: 1,
-    title: '第一章：认识网页是怎么跑起来的',
-    subtitle: '先看懂浏览器、HTML、CSS 和项目入口之间的关系',
-    duration: '2-3 天',
-    summary: '这一章先不追求会写 Vue 语法，而是建立对页面结构、入口文件和样式来源的基本认识。',
+    title: '第一章：浏览器、页面结构与 Vite 入口',
+    subtitle: '先搞清楚页面是怎么被加载出来的，再谈 Vue 语法',
+    duration: '2 天',
+    phase: 'foundations',
+    summary: '这一章先建立前端运行模型。你需要知道浏览器先读什么、Vite 做了什么、Vue 是怎么挂载到页面上的。',
     goals: [
-      '知道浏览器如何从 `index.html` 进入到 `src/main.ts` 和 `App.vue`',
-      '能区分 HTML 结构、CSS 样式和 JavaScript 行为分别负责什么',
-      '开始使用开发者工具查看元素、样式和网络请求',
+      '知道 `index.html`、`src/main.ts`、`App.vue` 和 `src/style.css` 的角色分工',
+      '理解 HTML 负责结构、CSS 负责表现、JavaScript 负责行为',
+      '开始使用浏览器开发者工具定位 DOM、样式和网络请求',
     ],
-    outcomes: [
-      '能说清楚当前页面是从哪些文件渲染出来的',
-      '能独立修改标题、段落和卡片样式并观察即时变化',
-    ],
+    outcomes: ['能独立修改页面标题、布局和局部样式', '能解释当前学习项目的入口链路'],
     starterSteps: [
-      '先打开 `index.html`、`src/main.ts`、`src/App.vue`、`src/style.css` 四个文件各看一遍',
-      '运行 `npm run dev` 后，边改文字边看浏览器变化',
-      '打开开发者工具，定位一个标题和一个卡片，看看它们的样式来自哪里',
+      '先通读 `index.html`、`src/main.ts`、`src/App.vue`、`src/style.css`',
+      '运行 `npm run dev`，边改文字边观察热更新',
+      '打开 DevTools，定位一个标题和一个卡片，确认样式来源',
     ],
     docs: [
-      {
-        title: '先建立页面入口的整体地图',
-        paragraphs: [
-          '浏览器最先读取的是 `index.html`。这个文件负责提供挂载点，并加载入口脚本。',
-          '`src/main.ts` 会创建 Vue 应用，再把 `App.vue` 挂到 `#app` 上，所以你看到的大部分页面内容都来自组件，而不是直接写在 `index.html` 里。',
+      createDocSection(
+        '浏览器先看到什么',
+        [
+          '浏览器不会先读 `App.vue`。它先读取 `index.html`，找到挂载点，再加载入口脚本。',
+          'Vite 在开发阶段会把模块依赖关系接起来，让你修改文件后页面可以即时更新。',
+          'Vue 真正负责的是把组件树渲染到 `#app` 里，所以主体界面通常都来自组件文件。',
         ],
-        bullets: [
-          '`index.html`：页面入口和挂载点',
-          '`src/main.ts`：创建应用并挂载',
-          '`src/App.vue`：当前页面结构和交互',
-          '`src/style.css`：全局视觉和布局样式',
+        ['先认入口，再认组件，再认样式来源'],
+        [
+          createCode(
+            '入口文件关系',
+            'html',
+            `<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>`,
+          ),
         ],
-      },
-      {
-        title: '零基础阶段先盯住这三件事',
-        paragraphs: [
-          '第一，不要急着背框架术语，先把“页面上看到的东西对应哪段代码”这件事搞清楚。',
-          '第二，每次只改一个点，例如只改标题、只改颜色、只改间距，这样更容易建立代码和结果之间的联系。',
-          '第三，尽早学会开发者工具。看懂元素结构和样式来源，比死记语法更重要。',
+      ),
+      createDocSection(
+        '前端三件套怎么分工',
+        [
+          'HTML 描述内容结构，比如标题、列表、按钮和表单。',
+          'CSS 决定视觉呈现，比如间距、颜色、排版和响应式布局。',
+          'JavaScript 处理状态和交互，比如点击、切换、请求和动态渲染。',
         ],
-      },
+        ['结构变动先看 HTML', '样式问题先看 CSS', '行为问题先看脚本'],
+      ),
+      createDocSection(
+        '为什么 Vite 适合入门',
+        [
+          'Vite 的开发服务器足够快，保存后几乎马上就能看到变化，这对建立反馈回路非常重要。',
+          '它默认支持 ESM 模块和 Vue 单文件组件，不需要你先搭一堆复杂配置。',
+          '对于新手来说，重点不是研究 bundler，而是把时间放在页面结构和数据流上。',
+        ],
+        undefined,
+        [
+          createCode(
+            'main.ts 最小挂载',
+            'ts',
+            `import { createApp } from 'vue'
+import App from './App.vue'
+import './style.css'
+
+createApp(App).mount('#app')`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '从 Python 后端视角理解页面加载',
+        [
+          '如果你熟悉 Django 或 Flask 模板，可以把 `index.html` 理解成壳页面，但 Vue 会继续在浏览器里接管后续渲染。',
+          '后端模板是服务端一次性生成 HTML，SPA 则是在客户端根据状态不断重绘视图。',
+          '所以前端开发更强调状态变更、组件边界和浏览器调试，而不只是输出字符串。',
+        ],
+      ),
     ],
     exercises: [
-      {
-        id: 'ch1-entry-map',
-        title: '练习 1：做一次最小页面改动',
-        intro: '通过修改标题、说明文字和背景样式，确认你已经知道这些内容分别来自哪个文件。',
-        files: ['index.html', 'src/App.vue', 'src/style.css'],
-        steps: [
-          '把 `index.html` 里的页面标题改成你自己的学习项目名',
-          '在 `src/App.vue` 的欢迎区域写一段“我这一周要完成什么”',
-          '在 `src/style.css` 调整主标题字号或背景色',
-        ],
-        verify: [
-          '浏览器标签页标题发生变化',
-          '页面内容和样式更新时不需要手动刷新',
-        ],
-      },
-      {
-        id: 'ch1-devtools',
-        title: '练习 2：用开发者工具验证你的修改',
-        intro: '从一开始就训练调试习惯，后面遇到样式和结构问题会轻松很多。',
-        files: ['src/App.vue', 'src/style.css'],
-        steps: [
-          '修改一个卡片标题或按钮文案',
-          '在开发者工具的 Elements 面板里找到它',
-          '在 Styles 面板临时改一个颜色，再对比源码里的真实样式',
-        ],
-        verify: [
-          '能在 Elements 面板找到你改过的节点',
-          '能区分临时调试样式和项目源码样式',
-        ],
-      },
+      createExercise(
+        'ch1-entry-map',
+        '练习 1：画出项目入口地图',
+        '把当前项目从浏览器到组件的加载链路自己复述一遍。',
+        ['index.html', 'src/main.ts', 'src/App.vue'],
+        ['写出页面先加载哪个文件，再进入哪个脚本，再渲染哪个组件', '把首页标题改成你自己的学习主题', '在页面上补一段“我为什么学 Vue”说明'],
+        ['刷新后改动仍然存在', '你能口头解释文件关系'],
+      ),
+      createExercise(
+        'ch1-devtools',
+        '练习 2：用 DevTools 验证样式来源',
+        '练习从界面反查源码，而不是盲猜样式在哪。',
+        ['src/App.vue', 'src/style.css'],
+        ['选一个卡片，用 Elements 面板定位节点', '在 Styles 面板临时改颜色和间距', '回到源码里做真正修改，再对比结果'],
+        ['能区分临时调试样式和源码样式', '能找到一个样式声明的准确位置'],
+      ),
     ],
-    milestone: '完成标准：你能讲清页面入口链路，并且不再害怕修改 HTML 和 CSS。',
+    milestone: '完成标准：你不再把 Vue 项目看成黑盒，而是知道浏览器、入口脚本和组件之间如何接起来。',
   },
   {
     id: 'chapter-2',
     order: 2,
     title: '第二章：JavaScript 基础与页面交互',
-    subtitle: '先掌握变量、数组、对象、函数，再理解页面为什么会响应点击',
-    duration: '3-4 天',
-    summary: '这一章解决“页面为什么会动”。先把 JavaScript 的基本数据和函数写顺，再进入组件逻辑。',
-    goals: [
-      '熟悉变量、数组、对象、条件判断和函数的基本用法',
-      '理解点击按钮、切换标签、更新文本这类交互背后是状态变化',
-      '开始把静态页面改成带一点交互的页面',
-    ],
-    outcomes: [
-      '能读懂页面里常见的列表渲染和条件显示逻辑',
-      '能自己加一个小开关、小筛选或小计数器',
-    ],
-    starterSteps: [
-      '先在纸上或笔记里写清楚：页面上哪些内容是固定的，哪些内容会变',
-      '把“章节列表”“完成状态”“笔记内容”这些页面数据当成对象和数组来看',
-      '练习先改数据，再看界面跟着变化',
-    ],
+    subtitle: '先理解变量、数组、对象和函数，再理解页面为什么会动',
+    duration: '3 天',
+    phase: 'foundations',
+    summary: '这一章解决“交互从哪里来”。你需要把页面变化抽象成状态变化，而不是把界面看成一堆零散标签。',
+    goals: ['熟悉变量、数组、对象、函数和条件判断', '理解按钮点击、筛选和切换背后其实是状态更新', '开始把页面数据看成对象和数组，而不是直接拼模板'],
+    outcomes: ['能写出搜索、计数、切换这种基础交互', '能把一段 UI 需求先翻译成数据结构和规则'],
+    starterSteps: ['先写出页面里哪些数据会变化，哪些不会变化', '把章节、资源、练习看成数组和对象', '练习用数组方法驱动界面结果，而不是手写重复内容'],
     docs: [
-      {
-        title: '页面交互的本质是状态变化',
-        paragraphs: [
-          '当你点击一个按钮时，本质上不是“页面自己变了”，而是某个变量的值发生了变化，界面重新显示了新的状态。',
-          '如果你能先把页面数据抽象成对象、数组和布尔值，再去写模板，就会比一上来直接拼页面稳定很多。',
+      createDocSection(
+        '页面交互本质是状态变化',
+        [
+          '点击按钮不会直接让页面神奇变化，本质是某个变量变了，然后页面重新渲染。',
+          '只要你能把状态列清楚，后续不管是原生 JS 还是 Vue，思路都一致。',
+          '状态通常包括字符串、数组、对象和布尔值，这四类足够覆盖大量入门页面。',
         ],
-      },
-      {
-        title: '新手最值得先练的四类数据',
-        paragraphs: [
-          '字符串用来放标题和说明，数组用来放列表，对象用来组织一组字段，布尔值用来表示开关和完成状态。',
-          '这四类数据已经能覆盖大多数入门页面。先把它们用熟，再往更复杂的语法走。',
+      ),
+      createDocSection(
+        '数组方法是前端高频武器',
+        [
+          '`map` 常用来把数据转换成展示项，`filter` 常用来筛选列表，`find` 常用来查单个对象。',
+          '对 Python 开发者来说，`map/filter` 可以类比列表推导式，但在前端里它们更直接服务于渲染。',
+          '学会这几个方法后，很多页面逻辑都会变成简单的数据操作。',
         ],
-      },
+        ['优先写纯数据操作，再让模板消费结果'],
+        [
+          createCode(
+            '列表筛选',
+            'js',
+            `const keyword = 'vue'
+const items = ['Vue 3', 'React', 'TypeScript']
+const result = items.filter((item) =>
+  item.toLowerCase().includes(keyword),
+)`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '对象和解构在页面中为什么重要',
+        [
+          '前端几乎所有业务数据都是对象数组，例如用户列表、订单列表、课程章节。',
+          '解构让你更方便地读取字段，但也要注意不要过度拆散，尤其在响应式场景里更要理解边界。',
+          '写页面之前先想数据长什么样，通常比直接写模板更稳。',
+        ],
+      ),
+      createDocSection(
+        '异步基础不要跳过',
+        [
+          '哪怕你现在还没正式写接口，请先熟悉 Promise 和 `async/await` 的思路。',
+          '前端请求接口、等待用户输入、延迟反馈，这些场景都离不开异步。',
+          '对 Python 开发者来说，`async/await` 不是新概念，但浏览器里更容易和 UI 状态绑在一起。',
+        ],
+        undefined,
+        [
+          createCode(
+            '异步请求骨架',
+            'ts',
+            `async function loadChapters() {
+  const response = await fetch('/api/chapters')
+  const data = await response.json()
+  return data
+}`,
+          ),
+        ],
+      ),
     ],
     exercises: [
-      {
-        id: 'ch2-filter',
-        title: '练习 1：给章节列表加一个搜索输入框',
-        intro: '这会让你把输入内容和列表结果联系起来，理解数据驱动视图。',
-        files: ['src/App.vue', 'src/style.css'],
-        steps: [
-          '新增一个输入框，保存搜索关键词',
-          '只显示标题或副标题里包含关键词的章节',
-          '为空时恢复完整列表',
-        ],
-        verify: [
-          '输入内容后列表实时变化',
-          '清空输入后列表恢复正常',
-        ],
-      },
-      {
-        id: 'ch2-toggle',
-        title: '练习 2：加一个“只看未完成”开关',
-        intro: '这是最典型的布尔状态练习。',
-        files: ['src/App.vue'],
-        steps: [
-          '新增一个布尔值表示是否隐藏已完成练习',
-          '根据这个状态过滤练习列表',
-          '在页面上显示“当前可见练习数 / 总练习数”',
-        ],
-        verify: [
-          '开关切换后，列表会立即更新',
-          '统计数字会随着筛选同步变化',
-        ],
-      },
+      createExercise(
+        'ch2-search',
+        '练习 1：给章节列表加搜索',
+        '让输入内容驱动列表筛选，这是最典型的数据驱动视图练习。',
+        ['src/App.vue', 'src/components/ChapterSidebar.vue'],
+        ['增加一个关键词状态', '根据标题和副标题筛选章节', '为空时恢复完整列表'],
+        ['输入时列表实时变化', '清空后恢复全部章节'],
+      ),
+      createExercise(
+        'ch2-toggle',
+        '练习 2：增加“只看未完成”开关',
+        '练习布尔状态和条件过滤。',
+        ['src/App.vue', 'src/views/OverviewView.vue'],
+        ['增加布尔状态保存过滤条件', '只展示还有未完成练习的章节', '在界面显示当前可见章节数'],
+        ['开关切换时界面立即更新', '计数结果和列表一致'],
+      ),
     ],
-    milestone: '完成标准：你开始把页面看成“数据 + 显示规则”，而不是一堆零散标签。',
+    milestone: '完成标准：你开始把交互问题理解成“状态 + 规则”，而不是堆按钮和事件。',
   },
   {
     id: 'chapter-3',
     order: 3,
-    title: '第三章：TypeScript 与数据建模',
-    subtitle: '给页面数据写类型，让结构更清楚，报错更及时',
-    duration: '3-4 天',
-    summary: '这一章的目标不是掌握所有 TS 语法，而是学会给页面数据建模，让代码更稳。',
-    goals: [
-      '知道 `interface`、`type`、可选属性和联合类型的基本使用场景',
-      '能为章节、练习、资源等数据定义清晰类型',
-      '养成先想数据结构再写页面的习惯',
-    ],
-    outcomes: [
-      '新增字段时能借助类型提示快速同步相关代码',
-      '减少因为字段名写错、结构不一致导致的低级错误',
-    ],
-    starterSteps: [
-      '从 `src/types/course.ts` 开始读，先看懂每个字段在页面上对应哪里',
-      '不要一下子追求复杂类型，先把对象和数组的类型写准确',
-      '每次改数据结构时，观察编辑器如何提示你同步修复其他位置',
-    ],
+    title: '第三章：TypeScript 与前端数据建模',
+    subtitle: '先学够用的类型，再让编辑器帮你守住结构',
+    duration: '3 天',
+    phase: 'foundations',
+    summary: '这一章不是追求炫技类型，而是学会给页面数据建模，让字段、结构和组件契约更稳定。',
+    goals: ['理解 `type`、`interface`、联合类型和泛型的基础用法', '能为章节、资源、练习和测验定义类型', '建立先定义数据结构再写界面的习惯'],
+    outcomes: ['能用类型提示快速定位字段改动带来的影响', '能减少因为命名错误和结构漂移导致的低级 bug'],
+    starterSteps: ['从 `src/types/course.ts` 反查每个类型被谁使用', '优先写清楚对象和数组结构，不急着写复杂泛型', '每次加字段都观察编辑器如何提示你同步修改其他位置'],
     docs: [
-      {
-        title: '为什么新手也要学类型',
-        paragraphs: [
-          '类型不是为了写得更复杂，而是为了在你改错字段、漏传数据、搞混结构时，编辑器能尽早提醒你。',
-          '页面数据一旦稍微变多，没有类型就很容易出现“页面为什么不显示”的低效排查。',
+      createDocSection(
+        '为什么前端也要重视建模',
+        [
+          '前端不是只有模板和样式，它同样要面对接口结构、组件参数和页面状态。',
+          '当页面规模一变大，没有类型约束就容易出现字段写错、结构不一致、空值漏判等问题。',
+          'TypeScript 的价值在于把很多错误提前到编码阶段，而不是等浏览器运行时报错。',
         ],
-      },
-      {
-        title: '够用就好，不要一开始追求炫技',
-        paragraphs: [
-          '入门阶段最重要的是把对象、数组、字符串、布尔值和少量联合类型用准确。',
-          '先把常见结构写稳，比一开始研究高阶类型收益更高。',
+      ),
+      createDocSection(
+        '先用够用的类型，不要一开始过度设计',
+        [
+          '入门阶段优先掌握对象、数组、字面量联合类型和少量泛型就够了。',
+          '复杂类型技巧不是不能学，但应该在你真实遇到问题时再引入。',
+          '你现在最需要的是稳定的数据契约，而不是类型体操。',
         ],
-        bullets: [
-          '`interface` 适合描述对象结构',
-          '`type` 适合写联合类型或别名',
-          '可选属性适合不一定会出现的数据',
+        ['`interface` 更适合对象结构', '`type` 更适合别名和联合类型'],
+      ),
+      createDocSection(
+        '把页面状态显式化',
+        [
+          '像 `loading`、`error`、`ready` 这类状态，如果只靠注释约定，维护成本会很高。',
+          '更稳妥的做法是把它们定义成联合类型，让非法值根本写不进去。',
+          '这类写法在真实业务里非常常见，例如请求状态、权限状态、表单状态。',
         ],
-      },
+        undefined,
+        [
+          createCode(
+            '联合类型约束状态',
+            'ts',
+            `type RequestState = 'idle' | 'loading' | 'success' | 'error'
+
+interface PageModel {
+  state: RequestState
+  message?: string
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '类型和运行时不是一回事',
+        [
+          'TypeScript 只在编译阶段工作，打包后运行的仍然是 JavaScript。',
+          '这意味着类型可以提前发现问题，但不能替代运行时校验。',
+          '真正对接后端时，接口返回的数据仍然需要做空值、字段存在性和异常处理。',
+        ],
+      ),
     ],
     exercises: [
-      {
-        id: 'ch3-status',
-        title: '练习 1：为章节增加学习状态',
-        intro: '这会练到联合类型和条件渲染。',
-        files: ['src/types/course.ts', 'src/data/courseContent.ts', 'src/App.vue', 'src/style.css'],
-        steps: [
-          '为章节增加状态字段，例如 `not-started`、`learning`、`reviewing`',
-          '用联合类型限制这些状态值',
-          '在页面上为不同状态显示不同样式',
-        ],
-        verify: [
-          '写错状态字符串时编辑器会提示错误',
-          '页面上能直观看到不同章节状态',
-        ],
-      },
-      {
-        id: 'ch3-resource-model',
-        title: '练习 2：补充一组自己的学习资源',
-        intro: '通过新增数据，体会类型如何帮助你维持结构一致。',
-        files: ['src/types/course.ts', 'src/data/courseContent.ts'],
-        steps: [
-          '新增 2-3 个你打算使用的学习资源',
-          '保持字段结构与已有资源一致',
-          '如果需要，给资源类型增加更清楚的分类',
-        ],
-        verify: [
-          '新增资源后页面能正常显示',
-          '没有出现字段缺失或命名不一致的问题',
-        ],
-      },
+      createExercise(
+        'ch3-status-model',
+        '练习 1：给章节增加学习状态类型',
+        '练习联合类型和样式映射。',
+        ['src/types/course.ts', 'src/data/courseContent.ts', 'src/components/ChapterSidebar.vue'],
+        ['定义 `not-started`、`learning`、`reviewing` 之类的状态', '给章节补充状态字段', '在侧栏上显示不同状态样式'],
+        ['写错状态值时编辑器报错', '不同状态有可视化区别'],
+      ),
+      createExercise(
+        'ch3-resource-model',
+        '练习 2：新增一组你自己的资源分类',
+        '通过补充数据体会类型约束如何保护结构一致性。',
+        ['src/types/course.ts', 'src/data/courseContent.ts'],
+        ['新增 2 到 3 个资源项', '保持结构与已有资源一致', '如有必要，扩展资源分类字段'],
+        ['页面正常显示', '没有出现字段缺失问题'],
+      ),
     ],
-    milestone: '完成标准：你开始在写页面前先想清楚数据长什么样。',
+    milestone: '完成标准：你已经能先想数据结构，再用类型把结构固定下来。',
   },
   {
     id: 'chapter-4',
     order: 4,
-    title: '第四章：Vue 3 响应式与模板',
-    subtitle: '理解 `ref`、`computed`、`v-model` 和列表渲染的实际用法',
-    duration: '4-5 天',
-    summary: '这一章重点不是背指令，而是搞清楚“数据变了，界面为什么会自动更新”。',
-    goals: [
-      '理解 `ref`、`computed`、`v-if`、`v-for`、`v-model` 的基本使用方式',
-      '学会把派生结果放进 `computed`，而不是把逻辑塞进模板',
-      '用响应式状态驱动输入、列表和统计信息',
-    ],
-    outcomes: [
-      '能自己做出带搜索、筛选、统计的学习页面',
-      '开始分辨哪些逻辑适合放在模板，哪些适合放在脚本里',
-    ],
-    starterSteps: [
-      '先看现有 `computed` 是如何从原始数据推导出显示结果的',
-      '把复杂判断先写成普通语言，再翻译成代码',
-      '模板里尽量只放展示逻辑，计算过程优先写在脚本区',
-    ],
+    title: '第四章：Vue 3 响应式、模板与计算属性',
+    subtitle: '从“改 DOM”切换到“改状态”',
+    duration: '4 天',
+    phase: 'foundations',
+    summary: '这一章开始真正进入 Vue 核心心智模型。重点不是背指令，而是理解状态变化如何驱动界面自动更新。',
+    goals: ['掌握 `ref`、`computed`、`v-model`、`v-if`、`v-for` 的基础使用', '知道什么逻辑该放模板，什么逻辑该放脚本', '能用响应式状态构建筛选、统计和表单输入'],
+    outcomes: ['能写出有搜索、统计、备注输入的学习页面', '能解释 Vue 为什么不鼓励你直接操作 DOM'],
+    starterSteps: ['先读现有 `computed` 和 `useLocalStorage` 的用法', '把复杂判断先写成人话，再翻成代码', '模板里优先展示结果，计算过程尽量放脚本区'],
     docs: [
-      {
-        title: '响应式可以理解成“改状态，不改 DOM”',
-        paragraphs: [
-          '在 Vue 里，你通常不需要手动去找节点再改文字，而是更新状态值，让模板重新渲染。',
-          '`ref` 用来保存可变状态，`computed` 用来根据已有状态生成新结果，`v-model` 负责把输入和状态连起来。',
+      createDocSection(
+        '响应式核心：你改的是状态，不是节点',
+        [
+          '在 Vue 里，你通常不需要先 `querySelector` 再改文本，而是直接更新状态。',
+          'Vue 会追踪状态依赖关系，在数据变化时重新渲染对应区域。',
+          '这也是组件开发能保持可维护性的基础，否则复杂页面很快就会变成手写 DOM 的泥潭。',
         ],
-      },
-      {
-        title: '模板要简洁，逻辑要可读',
-        paragraphs: [
-          '如果一段模板里出现很多判断和过滤，就说明这段逻辑更适合搬到 `computed` 里。',
-          '让模板负责展示，让脚本负责数据和规则，后续维护会轻松很多。',
+      ),
+      createDocSection(
+        'ref、reactive、computed 的分工',
+        [
+          '`ref` 更适合单个值，`reactive` 更适合对象，`computed` 用来表达派生结果。',
+          '如果一个值可以从其他状态推导出来，就不要再单独存一份。',
+          '这样可以减少状态冗余，避免多个地方不同步。',
         ],
-      },
+        undefined,
+        [
+          createCode(
+            '从原始状态推导统计',
+            'vue',
+            `const completed = ref(6)
+const total = ref(14)
+
+const progress = computed(() => {
+  return Math.round((completed.value / total.value) * 100)
+})`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '模板为什么要保持干净',
+        [
+          '模板是给人读的。如果模板里塞满筛选、排序、格式化和条件嵌套，维护成本会迅速上升。',
+          '更好的方式是让模板只消费结果，把数据准备过程放到脚本中。',
+          '当你开始觉得模板难读时，通常就该提炼 `computed` 或子组件了。',
+        ],
+      ),
+      createDocSection(
+        'v-model 其实是双向同步约定',
+        [
+          '`v-model` 让输入框和状态保持同步，适合文本框、选择器和表单组件。',
+          '但它不是魔法，本质仍然是读取当前值并在输入时更新状态。',
+          '理解这一点后，你在自定义组件中也更容易掌握 `modelValue` 机制。',
+        ],
+      ),
     ],
     exercises: [
-      {
-        id: 'ch4-summary',
-        title: '练习 1：给首页增加学习摘要卡片',
-        intro: '练习如何从现有状态中派生出可展示的信息。',
-        files: ['src/App.vue', 'src/style.css'],
-        steps: [
-          '新增一个摘要区域，显示已完成练习数、当前章节和剩余章节数',
-          '使用 `computed` 生成这些统计值',
-          '不要在模板里直接写复杂计算表达式',
-        ],
-        verify: [
-          '勾选练习后摘要卡片会同步更新',
-          '模板结构依然保持清晰',
-        ],
-      },
-      {
-        id: 'ch4-note',
-        title: '练习 2：为当前章节增加一个“今日收获”输入框',
-        intro: '练习 `v-model` 和本地状态同步。',
-        files: ['src/App.vue'],
-        steps: [
-          '在章节页新增一个文本输入区域',
-          '通过 `v-model` 绑定章节笔记',
-          '切换章节时显示对应章节自己的笔记内容',
-        ],
-        verify: [
-          '输入内容后页面立即更新',
-          '切换章节后能看到不同章节对应的笔记',
-        ],
-      },
+      createExercise(
+        'ch4-summary-card',
+        '练习 1：做一个学习进度摘要卡片',
+        '练习从已有状态中推导 UI 结果。',
+        ['src/views/OverviewView.vue', 'src/App.vue'],
+        ['新增摘要卡片展示已完成练习、通过测验和当前章节', '用 `computed` 组织展示数据', '避免在模板里直接写复杂表达式'],
+        ['勾选练习后摘要会同步变化', '模板保持可读'],
+      ),
+      createExercise(
+        'ch4-note',
+        '练习 2：为每章增加“今日收获”输入框',
+        '练习 `v-model` 和章节级状态切换。',
+        ['src/views/ChapterView.vue', 'src/App.vue'],
+        ['在章节页增加一个笔记输入区', '切换章节时读取对应章节笔记', '返回章节后笔记仍然存在'],
+        ['输入内容实时更新', '不同章节的笔记互不覆盖'],
+      ),
     ],
-    milestone: '完成标准：你已经能让页面跟着状态变化，而不是依赖手动操作 DOM。',
+    milestone: '完成标准：你已经能用“状态驱动视图”的方式写页面，而不是手动改 DOM。',
   },
   {
     id: 'chapter-5',
     order: 5,
-    title: '第五章：组件拆分与小型项目结构',
-    subtitle: '把大页面拆成多个文件，让结构更清楚、更容易继续扩展',
-    duration: '4-6 天',
-    summary: '这一章把前面的知识串起来，开始形成真正可维护的小型项目结构。',
-    goals: [
-      '学会识别哪些区域应该拆成组件或视图文件',
-      '理解 props 传值和事件回传的基本协作方式',
-      '知道何时把可复用逻辑放进 composable',
-    ],
-    outcomes: [
-      '能把学习总览、章节详情、路线说明拆成多个文件',
-      '能逐步把单文件页面演进为更有层次的小项目',
-    ],
-    starterSteps: [
-      '先按“导航、总览、详情、资源”拆视觉区域，再考虑逻辑边界',
-      '重复结构优先拆组件，页面级内容优先拆视图文件',
-      '和模板无强绑定的逻辑，优先考虑放到 composable',
-    ],
+    title: '第五章：组件拆分与项目结构',
+    subtitle: '从一个大页面走向职责清晰的模块化结构',
+    duration: '4 天',
+    phase: 'core',
+    summary: '这一章关注结构设计。你会开始知道什么时候该拆组件、什么时候该拆视图、什么时候该拆数据模块。',
+    goals: ['识别可复用视图块和重复结构', '掌握 `props`、事件回传和插槽的基本协作方式', '初步建立按功能和职责组织目录的习惯'],
+    outcomes: ['能把大页面拆成头部、侧栏、内容区和功能卡片', '能避免把所有逻辑继续堆在 `App.vue` 里'],
+    starterSteps: ['先从重复 UI 下手拆组件', '再把整页内容拆成视图组件', '最后把纯数据和纯逻辑移动到独立模块'],
     docs: [
-      {
-        title: '拆分的目标不是文件越多越好',
-        paragraphs: [
-          '拆分的意义在于让每个文件职责明确：谁负责导航，谁负责详情，谁负责展示资源，一眼就能看懂。',
-          '如果一个文件已经同时负责布局、列表、表单、统计和多个交互，通常就值得拆开了。',
+      createDocSection(
+        '拆分不是为了文件更多',
+        [
+          '拆分的目标是职责清晰。每个文件最好能一句话说清它负责什么。',
+          '当一个文件同时处理布局、逻辑、表单、统计和弹窗时，通常就值得拆分。',
+          '但拆得过细也会增加跳转成本，所以要结合复用价值和认知负担判断。',
         ],
-      },
-      {
-        title: '新手拆分时优先看这两个标准',
-        paragraphs: [
-          '第一，这一块是不是能独立讲清楚职责。第二，这一块是不是未来还会反复修改或复用。',
-          '符合其中一个标准，就可以考虑拆分，而不是等到文件巨大后再动手。',
+      ),
+      createDocSection(
+        '父子协作的基本模式',
+        [
+          '父组件负责组织数据和规则，子组件负责聚焦展示和局部交互。',
+          '父组件通过 `props` 把数据传下去，子组件通过事件把动作抛回来。',
+          '先把这条单向数据流练熟，再引入全局状态会更自然。',
         ],
-      },
+        undefined,
+        [
+          createCode(
+            'props 和 emit 协作',
+            'vue',
+            `const props = defineProps<{ title: string }>()
+
+const emit = defineEmits<{
+  select: [id: string]
+}>()`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '什么时候该拆视图',
+        [
+          '当一个区域已经能独立讲清业务目标，例如总览页、章节页、资源页，就适合拆成视图。',
+          '视图组件让入口文件更像控制中心，而不是巨型模板。',
+          '对学习项目来说，这一步很重要，因为它会逼你梳理页面边界。',
+        ],
+      ),
+      createDocSection(
+        '什么时候该拆数据模块',
+        [
+          '静态课程数据、资源列表、题库数据都不应该和页面模板混在一起。',
+          '把它们拆出去以后，你会更容易同时关注数据内容和展示方式。',
+          '这也是后续做接口替换时最常见的准备动作。',
+        ],
+      ),
     ],
     exercises: [
-      {
-        id: 'ch5-sidebar',
-        title: '练习 1：把章节导航拆成独立组件',
-        intro: '这是最适合开始练 props 和事件的部分。',
-        files: ['src/App.vue', 'src/components/ChapterSidebar.vue'],
-        steps: [
-          '把章节列表区域抽到 `ChapterSidebar.vue`',
-          '通过 props 传入章节数据、当前选中章节和完成统计',
-          '通过事件把章节切换动作通知给父组件',
-        ],
-        verify: [
-          '页面功能保持正常，`App.vue` 变得更短',
-          '子组件没有直接依赖父组件内部变量',
-        ],
-      },
-      {
-        id: 'ch5-views',
-        title: '练习 2：拆出总览页和路线页',
-        intro: '让项目从一个大页面演进为多个视图文件。',
-        files: ['src/views/OverviewView.vue', 'src/views/RoadmapView.vue', 'src/App.vue'],
-        steps: [
-          '把首页摘要和学习路线拆到不同视图文件',
-          '保留一个清晰的顶部导航切换视图',
-          '确保切换视图时当前学习进度不丢失',
-        ],
-        verify: [
-          '不同视图文件职责清楚',
-          '切换页面时本地进度和笔记仍然保留',
-        ],
-      },
+      createExercise(
+        'ch5-sidebar',
+        '练习 1：重做章节侧栏分组',
+        '把侧栏从简单列表升级为带阶段分组的导航。',
+        ['src/components/ChapterSidebar.vue', 'src/style.css'],
+        ['按阶段对章节分组', '显示每个阶段的章节数和完成状态', '保持点击切换逻辑不变'],
+        ['侧栏更清晰', '现有导航功能无回归'],
+      ),
+      createExercise(
+        'ch5-layout',
+        '练习 2：把总览页拆成多个信息板块',
+        '练习在一个页面里组织多个职责明确的组件区块。',
+        ['src/views/OverviewView.vue', 'src/style.css'],
+        ['区分课程介绍、阶段路线、进度统计和推荐起步动作', '给每个板块一个明确标题', '避免所有信息塞在同一张卡片里'],
+        ['总览结构更清楚', '每个板块都有独立意图'],
+      ),
     ],
-    milestone: '完成标准：你的项目已经不再依赖单个巨型 `App.vue`，结构开始清晰。',
+    milestone: '完成标准：你已经能把页面拆成有边界的模块，而不是继续扩张单个大文件。',
   },
   {
     id: 'chapter-6',
     order: 6,
-    title: '第六章：路由、状态管理与请求封装',
-    subtitle: '从单页学习台进化为真正的多页应用',
-    duration: '5-7 天',
-    summary: '这一章把前面的组件知识用起来，引入 Vue Router、Pinia 和请求层，让你能搭出接近真实业务的页面结构。',
-    goals: [
-      '学会安装和配置 Vue Router，实现多页面切换',
-      '用 Pinia 创建 store 管理跨组件共享状态',
-      '封装可复用的请求模块，统一处理加载态和错误态',
-    ],
-    outcomes: [
-      '能独立搭建包含登录页、列表页、详情页的小型后台',
-      '理解页面间导航和数据流转的完整链路',
-    ],
-    starterSteps: [
-      '先回顾第五章的组件拆分，确认每个视图可以独立工作',
-      '安装 Vue Router 和 Pinia，先跑通最小配置',
-      '把现有的 useLocalStorage 替换为 Pinia store + 持久化插件',
-    ],
+    title: '第六章：响应式进阶、watch 与副作用',
+    subtitle: '开始区分状态、派生结果和副作用处理',
+    duration: '4 天',
+    phase: 'core',
+    summary: '这一章让你更细致地理解 Vue 响应式。重点是知道何时用 `computed`，何时用 `watch`，何时抽到 composable。',
+    goals: ['理解 `watch`、`watchEffect`、`toRefs` 等进阶响应式 API', '避免把副作用塞进 `computed`', '理解 reactive 解构、深层追踪和依赖收集的边界'],
+    outcomes: ['能处理本地持久化、自动同步和监听类逻辑', '能解释为什么有些状态变化没有触发预期更新'],
+    starterSteps: ['先确认哪些逻辑是纯计算，哪些逻辑会产生副作用', '复盘现有 `useLocalStorage` 为什么更适合用监听机制', '用最小示例感受 `ref`、`reactive` 和解构后的差别'],
     docs: [
-      {
-        title: '为什么需要路由和状态管理',
-        paragraphs: [
-          '当你的应用从"一个页面里切换区域"变成"多个独立页面"时，就需要路由来管理 URL 和页面对应关系。',
-          '当多个页面需要共享同一份数据（比如用户信息、学习进度）时，就需要状态管理来避免数据传递混乱。',
+      createDocSection(
+        '为什么要区分副作用',
+        [
+          '修改 localStorage、发请求、写日志、触发动画，这些都属于副作用。',
+          '副作用不应该塞进 `computed`，因为 `computed` 更适合纯粹的结果推导。',
+          '一旦计算属性里开始偷偷改状态，排错会变得非常困难。',
         ],
-      },
-      {
-        title: '请求封装不是调用一个函数那么简单',
-        paragraphs: [
-          '真实的业务请求需要统一处理 loading 状态、错误提示、token 过期重定向等。这些逻辑不应该散落在每个组件里。',
-          '先封装一个基础的请求工具函数，再用它包装具体的 API 方法，这样换请求库或改错误处理时只需要改一处。',
+      ),
+      createDocSection(
+        'watch 和 watchEffect 的边界',
+        [
+          '`watch` 适合明确指定监听源，`watchEffect` 适合快速追踪回调内部用到的依赖。',
+          '如果你需要比较新旧值、控制触发时机，通常优先选 `watch`。',
+          '如果你只想“依赖什么就自动重跑什么”，`watchEffect` 更省事。',
         ],
-      },
+        undefined,
+        [
+          createCode(
+            '本地持久化监听',
+            'ts',
+            `watch(progress, (value) => {
+  localStorage.setItem('progress', JSON.stringify(value))
+}, { deep: true })`,
+          ),
+        ],
+      ),
+      createDocSection(
+        'reactive 解构为什么会出问题',
+        [
+          '很多新手会直接从 `reactive` 对象里解构字段，结果发现后续更新不再响应。',
+          '这是因为你拿到的是当前值，而不是继续受代理追踪的引用。',
+          '需要保留响应式连接时，可以使用 `toRefs` 或直接保留对象访问。',
+        ],
+      ),
+      createDocSection(
+        '深层对象监听要克制',
+        [
+          '深层监听虽然方便，但也会带来额外成本和更难理解的触发链路。',
+          '更稳妥的做法是尽量把状态结构扁平化，把变化点收束到明确字段。',
+          '当你发现一个状态对象越来越大，通常应该考虑拆模块或拆 composable。',
+        ],
+      ),
     ],
     exercises: [
-      {
-        id: 'ch6-router',
-        title: '练习 1：引入 Vue Router，把学习台改成多页应用',
-        intro: '把 v-if 切换视图改为 URL 驱动的路由切换。',
-        files: ['src/App.vue', 'src/router/index.ts', 'src/main.ts'],
-        steps: [
-          '安装 vue-router，创建 router 配置',
-          '为总览、章节、路线、资料分别创建路由',
-          '用 router-link 替代手动切换视图的按钮',
-        ],
-        verify: [
-          '浏览器地址栏 URL 随导航切换变化',
-          '刷新页面后仍然停留在当前视图',
-        ],
-      },
-      {
-        id: 'ch6-store',
-        title: '练习 2：用 Pinia 管理学习进度',
-        intro: '把分散在 useLocalStorage 里的状态集中到 Pinia store 中。',
-        files: ['src/stores/progress.ts', 'src/App.vue', 'src/views/ChapterView.vue'],
-        steps: [
-          '安装 Pinia，创建 progress store',
-          '把完成状态和笔记迁移到 store 中',
-          '使用 Pinia 持久化插件替代 useLocalStorage',
-        ],
-        verify: [
-          '学习进度在页面刷新后依然保留',
-          '多个组件可以同时访问同一份进度数据',
-        ],
-      },
+      createExercise(
+        'ch6-watch-storage',
+        '练习 1：自己实现一个最小 `watch` 持久化',
+        '不要先看 composable，先亲手把监听和存储串一遍。',
+        ['src/App.vue', 'src/composables/useLocalStorage.ts'],
+        ['选一个简单状态做本地持久化', '用 `watch` 同步到 localStorage', '刷新页面后恢复数据'],
+        ['状态刷新后保留', '没有把副作用写进 `computed`'],
+      ),
+      createExercise(
+        'ch6-reactive-boundary',
+        '练习 2：验证 reactive 解构边界',
+        '用一个最小实验理解为什么有时界面不更新。',
+        ['src/views/ChapterView.vue'],
+        ['构造一个 reactive 对象', '分别测试直接访问和解构后的更新表现', '记录差异和原因'],
+        ['你能解释差异来源', '实验结果符合预期'],
+      ),
     ],
-    milestone: '完成标准：你能搭建一个包含路由、状态管理和请求层的小型项目骨架。',
+    milestone: '完成标准：你能区分纯计算和副作用，也知道 watch 该在什么场景出手。',
+  },
+  {
+    id: 'chapter-7',
+    order: 7,
+    title: '第七章：Composables 与逻辑复用',
+    subtitle: '把重复的状态管理和副作用提炼成可复用模块',
+    duration: '5 天',
+    phase: 'core',
+    summary: '这一章进入 Composition API 的真正生产用法。目标是把逻辑从页面里抽离出来，形成可维护的 composable。',
+    goals: ['识别适合抽取的可复用逻辑', '理解 composable 的输入、输出和生命周期边界', '能抽出和 UI 解耦的逻辑模块'],
+    outcomes: ['能把搜索、分页、本地缓存、请求状态等逻辑抽成 composable', '能避免 composable 里偷偷依赖具体页面结构'],
+    starterSteps: ['先找重复逻辑，不要先找重复模板', '明确 composable 接收什么参数、返回什么状态和方法', '保证 composable 不直接关心某个页面长什么样'],
+    docs: [
+      createDocSection(
+        '什么样的逻辑值得抽成 composable',
+        [
+          '如果一段逻辑和具体模板无强绑定，并且未来会重复出现，就值得提炼。',
+          '例如搜索关键字管理、分页状态、localStorage 同步、接口加载状态都是典型候选。',
+          '相反，如果逻辑只服务于一个很局部的模板结构，先留在组件里通常更简单。',
+        ],
+      ),
+      createDocSection(
+        'composable 最重要的是边界清晰',
+        [
+          '一个好的 composable 要能说清楚输入、输出和副作用。',
+          '输入通常是参数、响应式引用或配置对象；输出通常是状态、计算属性和方法。',
+          '边界清晰以后，它才能在多个页面里复用，而不是只是把复杂度换个地方堆积。',
+        ],
+        undefined,
+        [
+          createCode(
+            '搜索逻辑 composable',
+            'ts',
+            `import { computed, ref } from 'vue'
+
+export function useKeywordFilter(items: string[]) {
+  const keyword = ref('')
+  const filteredItems = computed(() =>
+    items.filter((item) => item.toLowerCase().includes(keyword.value.toLowerCase())),
+  )
+
+  return { keyword, filteredItems }
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '和 Python 工具函数的区别',
+        [
+          '普通工具函数只处理入参和返回值，而 composable 可以持有响应式状态和生命周期。',
+          '因此它更像一个有状态的小模块，而不只是函数封装。',
+          '这也是为什么 composable 要特别注意副作用和清理逻辑。',
+        ],
+      ),
+      createDocSection(
+        '避免把 composable 写成迷你框架',
+        [
+          '初学者容易把所有逻辑都抽进去，最后 composable 比页面还难懂。',
+          '更稳妥的做法是一次只抽一类明确职责，例如过滤、分页、持久化、请求。',
+          '先让 composable 好读，再谈它是否通用到极致。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch7-extract-filter',
+        '练习 1：抽取章节搜索 composable',
+        '把总览页或侧栏的搜索逻辑提炼为可复用模块。',
+        ['src/composables/useChapterFilter.ts', 'src/views/OverviewView.vue'],
+        ['定义关键词状态和筛选结果', '返回供组件消费的状态与方法', '让视图层只负责绑定输入和渲染结果'],
+        ['功能保持正常', '视图代码更短更清楚'],
+      ),
+      createExercise(
+        'ch7-extract-progress',
+        '练习 2：抽取学习进度统计 composable',
+        '把练习统计和测验统计从视图中剥离出来。',
+        ['src/composables/useLearningProgress.ts', 'src/App.vue'],
+        ['接收章节、完成记录和测验记录', '返回总进度和阶段进度', '在多个视图复用同一份计算结果'],
+        ['多个页面展示一致', '视图中减少重复统计逻辑'],
+      ),
+      createExercise(
+        'ch7-composable-review',
+        '练习 3：审查现有 composable 的 API',
+        '不是所有 composable 都需要重写，但需要学会判断 API 是否合理。',
+        ['src/composables/useLocalStorage.ts'],
+        ['写出它的输入、输出和副作用', '判断是否有命名或边界可以优化', '记录你的判断依据'],
+        ['你能清楚说明这个 composable 的职责', '能指出至少一处可优化点'],
+      ),
+    ],
+    milestone: '完成标准：你已经能把重复逻辑从页面里抽出，并且保持清晰边界。',
+  },
+  {
+    id: 'chapter-8',
+    order: 8,
+    title: '第八章：表单处理、用户输入与数据校验',
+    subtitle: '别把表单看成一堆输入框，它本质上是状态机',
+    duration: '5 天',
+    phase: 'core',
+    summary: '表单是前端最典型的复杂交互之一。这一章聚焦输入同步、校验、错误提示、提交状态和可访问性。',
+    goals: ['建立表单状态、错误状态和提交状态的清晰模型', '掌握基础校验、即时校验和提交校验的差异', '能设计对用户友好的错误反馈和禁用策略'],
+    outcomes: ['能完成带校验规则的创建或编辑表单', '能把前端校验和后端校验分清职责'],
+    starterSteps: ['先列出字段、默认值、错误信息和提交流程', '区分输入中、已触碰、可提交、提交中这些状态', '不要把校验逻辑散落在模板判断里'],
+    docs: [
+      createDocSection(
+        '为什么表单容易失控',
+        [
+          '表单同时拥有字段值、格式校验、业务校验、提交流程和错误提示，状态远比静态展示复杂。',
+          '如果没有明确模型，很容易出现按钮状态不对、错误提示闪烁、请求重复提交等问题。',
+          '把表单看成一个状态机，会比把它看成很多输入框更有效。',
+        ],
+      ),
+      createDocSection(
+        '前端校验和后端校验的边界',
+        [
+          '前端校验主要负责即时反馈，例如必填、长度、格式和基础组合规则。',
+          '后端校验负责最终可信规则，例如唯一性、权限、库存和业务约束。',
+          '不要把前端校验当成安全手段，但也不要完全省略它，因为体验会很差。',
+        ],
+      ),
+      createDocSection(
+        '何时展示错误信息',
+        [
+          '错误提示太早会打断输入，太晚又会让用户迷失。',
+          '常见策略是字段失焦后展示单字段错误，提交时统一展示整体错误。',
+          '对复杂表单，建议结合已触碰状态和是否提交过状态决定提示时机。',
+        ],
+        undefined,
+        [
+          createCode(
+            '字段校验骨架',
+            'ts',
+            `interface LoginForm {
+  email: string
+  password: string
+}
+
+function validate(form: LoginForm) {
+  return {
+    email: form.email ? '' : '请输入邮箱',
+    password: form.password.length >= 8 ? '' : '密码至少 8 位',
+  }
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '提交状态必须显式管理',
+        [
+          '提交中要不要禁用按钮、失败后是否保留输入、成功后是否重置，这些都需要明确。',
+          '如果不显式维护 `submitting`、`success`、`error` 状态，就容易出现重复点击和状态错乱。',
+          '表单是最适合练习状态设计的业务模块。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch8-login-form',
+        '练习 1：做一个登录表单',
+        '用最小业务场景练习输入、校验和提交状态。',
+        ['src/views/ChapterView.vue', 'src/style.css'],
+        ['包含邮箱和密码字段', '实现必填与最小长度校验', '提交时展示 loading 状态并禁用按钮'],
+        ['无效输入无法提交', '提交中不能重复点击'],
+      ),
+      createExercise(
+        'ch8-profile-form',
+        '练习 2：做一个资料编辑表单',
+        '练习多字段、分组校验和错误提示布局。',
+        ['src/components/ExerciseCard.vue', 'src/style.css'],
+        ['设计昵称、角色、个人简介三个字段', '分别处理即时校验和提交校验', '给出明确错误提示'],
+        ['错误提示和字段一一对应', '通过校验后提交成功'],
+      ),
+      createExercise(
+        'ch8-form-review',
+        '练习 3：复盘现有输入交互',
+        '把你做过的输入场景整理成状态图。',
+        ['docs/LEARNING_PLAN.md'],
+        ['选一个输入场景', '写出默认、输入中、校验失败、提交中、提交成功五个状态', '记录各状态之间如何切换'],
+        ['状态图清楚', '你能口头解释切换条件'],
+      ),
+    ],
+    milestone: '完成标准：你已经能把表单当成状态管理问题来设计，而不是只会绑定输入框。',
+  },
+  {
+    id: 'chapter-9',
+    order: 9,
+    title: '第九章：视图管理与应用架构',
+    subtitle: '从学习页面过渡到真实应用的页面组织方式',
+    duration: '6 天',
+    phase: 'architecture',
+    summary: '这一章开始站到应用层看项目。重点是页面层次、路由分工、布局壳和功能模块边界。',
+    goals: ['理解布局壳、页面视图和业务组件的分层', '知道何时引入路由，何时保留单页视图切换', '学会按功能模块组织前端目录'],
+    outcomes: ['能规划一个带列表页、详情页、设置页的应用骨架', '能避免把业务逻辑和布局逻辑混在一起'],
+    starterSteps: ['从当前学习平台抽象出哪些属于布局，哪些属于内容', '画出页面层级关系图', '按模块而不是按文件类型思考新增功能'],
+    docs: [
+      createDocSection(
+        '先分层，再写页面',
+        [
+          '一个真实应用至少要区分布局壳、视图页面和可复用业务组件。',
+          '布局壳关注导航和页面骨架，视图关注单页业务目标，组件关注局部功能块。',
+          '如果三者混在一起，需求一变就会牵一大片。',
+        ],
+      ),
+      createDocSection(
+        '路由不是越早越好，但也不是越晚越好',
+        [
+          '当你的页面已经拥有独立的目标和 URL 价值时，就值得用路由管理。',
+          '如果只是局部标签切换或单个工作台的视图切换，先用组件状态就够了。',
+          '关键不是技术先进，而是边界是否清楚。',
+        ],
+        undefined,
+        [
+          createCode(
+            '应用骨架示例',
+            'ts',
+            `src/
+  layouts/
+  views/
+  components/
+  composables/
+  data/
+  types/`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '从页面到模块的切分方式',
+        [
+          '按功能切分通常比按技术切分更稳定，例如 `users/`、`courses/`、`settings/`。',
+          '因为真实需求通常是围绕业务模块变化，而不是只改所有组件或所有工具函数。',
+          '学习项目里不一定要一次到位，但要开始具备这种组织意识。',
+        ],
+      ),
+      createDocSection(
+        '架构设计的标准不是抽象，而是可演进',
+        [
+          '如果一个结构让新增页面、替换数据源和增加权限逻辑都更容易，那它就是好结构。',
+          '如果一个结构只是让命名更复杂、文件更多，但没有降低修改成本，那它就没价值。',
+          '架构判断永远要回到后续演进成本上。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch9-app-map',
+        '练习 1：画一个小型管理台的信息架构图',
+        '在动手写代码前先练页面分层。',
+        ['docs/LEARNING_PLAN.md'],
+        ['选择一个熟悉业务，例如任务管理或用户管理', '画出列表、详情、设置和登录页面关系', '标出哪些是布局层、哪些是视图层、哪些是组件层'],
+        ['层级关系清楚', '页面职责不互相混淆'],
+      ),
+      createExercise(
+        'ch9-layout-refactor',
+        '练习 2：重做当前课程总览的信息架构',
+        '把课程总览从普通首页升级为阶段化课程门户。',
+        ['src/views/OverviewView.vue', 'src/style.css'],
+        ['区分英雄区、阶段路线、推荐行动和课程列表', '加强阶段分层和节奏感', '让 14 章内容在总览中仍然易扫读'],
+        ['总览不再拥挤', '14 章信息仍然容易定位'],
+      ),
+      createExercise(
+        'ch9-module-structure',
+        '练习 3：为未来路由化提前调整目录',
+        '先做结构准备，不急着全部上路由。',
+        ['src/views', 'src/components', 'src/composables'],
+        ['审查现有目录', '记录哪些模块未来会需要独立路由', '调整一个你觉得最混乱的结构点'],
+        ['目录层次更符合业务心智', '后续扩展更自然'],
+      ),
+    ],
+    milestone: '完成标准：你已经能站在应用层设计页面结构，而不是只盯单个组件。',
+  },
+  {
+    id: 'chapter-10',
+    order: 10,
+    title: '第十章：HTTP 请求、异步数据流与错误处理',
+    subtitle: '让页面真正接入后端，而不是停留在静态数据',
+    duration: '6 天',
+    phase: 'architecture',
+    summary: '这一章解决页面如何和后端对话。除了请求本身，更重要的是 loading、error、empty、retry 和缓存策略。',
+    goals: ['理解请求生命周期和典型页面状态', '掌握接口封装、错误处理和重试的基本方式', '能设计异步数据的用户反馈'],
+    outcomes: ['能写出列表加载、详情加载和提交请求的完整流程', '能把请求错误和业务错误区分开来'],
+    starterSteps: ['先画出一个请求从发起到结束的状态流转', '明确哪些错误应该提示用户，哪些错误应该记录日志', '把网络层和页面层职责分开'],
+    docs: [
+      createDocSection(
+        '请求不是拿到数据这么简单',
+        [
+          '真正的前端请求流程至少包含 idle、loading、success、empty、error 五类常见状态。',
+          '如果页面只处理成功路径，真实业务中很快就会暴露大量体验问题。',
+          '所以异步数据流的重点是状态管理，而不是只会 `fetch`。',
+        ],
+      ),
+      createDocSection(
+        '网络层应该统一收口',
+        [
+          '请求头、超时、基础错误转换、鉴权处理，这些逻辑最好集中在请求层，而不是散落在页面里。',
+          '页面应该更关注我要拿什么数据和如何展示状态。',
+          '请求层统一以后，后续换 axios 或新增鉴权逻辑都会容易很多。',
+        ],
+        undefined,
+        [
+          createCode(
+            '请求封装骨架',
+            'ts',
+            `export async function http<T>(url: string): Promise<T> {
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error(\`HTTP \${response.status}\`)
+  }
+
+  return response.json() as Promise<T>
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '错误要分层处理',
+        [
+          '网络错误、权限错误、业务校验失败、空数据，这些情况不能用同一种提示糊过去。',
+          '用户需要知道是自己填错了，还是系统暂时不可用，还是当前没有数据。',
+          '你能否分层处理错误，基本决定了应用是否专业。',
+        ],
+      ),
+      createDocSection(
+        '异步状态和界面反馈要成对出现',
+        [
+          '有 loading 就该有 skeleton 或占位，有 error 就该有 retry，有 empty 就该有引导。',
+          '这些不是锦上添花，而是异步页面的基本完成度。',
+          '后端开发者转前端时，最容易忽略的就是这一层用户反馈。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch10-request-wrapper',
+        '练习 1：封装一个最小请求函数',
+        '目标不是造轮子，而是学会把重复逻辑收口。',
+        ['src/data/courseContent.ts', 'src/composables/useLocalStorage.ts'],
+        ['定义统一请求函数', '处理非 2xx 响应', '在页面中消费它并展示错误状态'],
+        ['成功和失败路径都能跑通', '页面不会静默失败'],
+      ),
+      createExercise(
+        'ch10-async-state',
+        '练习 2：为一个列表设计 loading / empty / error 三态',
+        '练习真正的异步 UI 完整度。',
+        ['src/views/OverviewView.vue', 'src/style.css'],
+        ['设计三种状态的文案和样式', '增加重试按钮', '确保状态切换不会互相覆盖'],
+        ['三态都能独立展示', '重试行为可用'],
+      ),
+      createExercise(
+        'ch10-api-compare',
+        '练习 3：对比一个后端接口契约',
+        '从你熟悉的后端接口出发设计前端消费模型。',
+        ['docs/LEARNING_PLAN.md'],
+        ['选一个分页接口', '列出成功响应、空列表和错误响应结构', '写出前端最小类型定义'],
+        ['契约清楚', '能对应到前端页面状态'],
+      ),
+    ],
+    milestone: '完成标准：你已经能把请求、状态和用户反馈完整串起来。',
+  },
+  {
+    id: 'chapter-11',
+    order: 11,
+    title: '第十一章：TypeScript 在 Vue 中的高级应用',
+    subtitle: '让类型真正参与组件契约、请求模型和业务状态设计',
+    duration: '6 天',
+    phase: 'architecture',
+    summary: '这一章不是炫耀高级类型，而是把类型更深地用进组件 props、事件、请求结果和复杂状态里。',
+    goals: ['强化 props、emit、泛型响应体和字面量状态约束', '理解类型缩小、判别联合和工具类型在 Vue 中的价值', '减少复杂页面中隐式 any 和空值问题'],
+    outcomes: ['能为组件 API 设计更稳的类型契约', '能用判别联合建模复杂界面状态'],
+    starterSteps: ['先审查现有组件有哪些参数和事件没有明确约束', '把请求结果和页面状态显式建模', '对复杂条件分支优先考虑判别联合'],
+    docs: [
+      createDocSection(
+        '组件契约必须类型化',
+        [
+          '当组件越来越多时，props 和事件就是你的前端接口文档。',
+          '如果这些边界不清楚，复用会越来越危险，调用方也容易猜错。',
+          'Vue 3 + TypeScript 的优势之一，就是让这些契约在编码时就被约束。',
+        ],
+        undefined,
+        [
+          createCode(
+            '带类型的事件定义',
+            'ts',
+            `const emit = defineEmits<{
+  submit: [chapterId: string, score: number]
+  retry: [chapterId: string]
+}>()`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '判别联合适合页面状态',
+        [
+          '当一个页面状态不只是一个字符串，而是每种状态还附带不同数据时，判别联合非常好用。',
+          '它能让你在不同分支里拿到更准确的类型，而不是处处判空。',
+          '这在请求页、表单页和工作流页都非常常见。',
+        ],
+        undefined,
+        [
+          createCode(
+            '页面状态建模',
+            'ts',
+            `type PageState =
+  | { kind: 'loading' }
+  | { kind: 'error'; message: string }
+  | { kind: 'ready'; items: string[] }`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '工具类型真正有用的地方',
+        [
+          '`Pick`、`Omit`、`Partial`、`Required` 等工具类型在处理表单草稿、更新接口和视图子集时非常实用。',
+          '它们的价值是减少重复定义，而不是制造花哨写法。',
+          '只在确实能降低维护成本时使用它们，效果最好。',
+        ],
+      ),
+      createDocSection(
+        '高级应用的标准不是复杂，而是更少歧义',
+        [
+          '如果类型写完以后，组件边界更清楚、重构更稳、补全更准确，那就是有效升级。',
+          '如果只是让代码更难读，说明这次高级应用没有价值。',
+          '判断标准永远是维护收益，而不是语法复杂度。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch11-typed-events',
+        '练习 1：为核心组件补齐事件类型',
+        '让交互边界更明确。',
+        ['src/components/QuizPanel.vue', 'src/components/ChapterSidebar.vue'],
+        ['审查 emit 定义', '去掉模糊类型和隐式 any', '验证调用侧提示是否更准确'],
+        ['事件签名清楚', '调用处补全更可靠'],
+      ),
+      createExercise(
+        'ch11-page-state',
+        '练习 2：用判别联合重写一个页面状态',
+        '不要只用字符串，给每种状态配上所需数据。',
+        ['src/views/ResourcesView.vue'],
+        ['定义 `loading`、`error`、`ready` 三类状态', '给错误状态附带 message', '给成功状态附带数据'],
+        ['模板分支更清楚', '空值判断减少'],
+      ),
+      createExercise(
+        'ch11-request-types',
+        '练习 3：为一个分页接口设计泛型类型',
+        '把数据契约和列表页面结合起来。',
+        ['src/types/course.ts'],
+        ['定义通用分页结果', '为章节或资源列表套用它', '说明这个泛型未来还能复用在哪'],
+        ['类型定义可复用', '字段语义准确'],
+      ),
+    ],
+    milestone: '完成标准：你已经能让类型参与组件契约和业务状态设计，而不是只给变量标注类型。',
+  },
+  {
+    id: 'chapter-12',
+    order: 12,
+    title: '第十二章：样式工程化、设计系统与动效',
+    subtitle: '把页面从能看提升到有秩序、有节奏、可复用',
+    duration: '5 天',
+    phase: 'production',
+    summary: '这一章聚焦样式体系。重点是设计变量、层级、间距、排版和少量有意义的动效，而不是随意堆颜色。',
+    goals: ['理解设计 token、组件状态样式和页面层级', '建立基础设计系统意识', '掌握有节制的过渡和动效'],
+    outcomes: ['能设计一套统一的色彩、间距和圆角规则', '能让课程页面在移动端和桌面端都更稳定'],
+    starterSteps: ['先从变量开始，不要先从零散类名开始', '统一颜色、阴影、圆角、间距和字号', '只保留有意义的动效，不要堆砌浮夸动画'],
+    docs: [
+      createDocSection(
+        '为什么样式也需要架构',
+        [
+          '页面一旦变多，如果颜色、间距、字体和圆角没有统一规则，维护会越来越乱。',
+          '样式工程化不是为了更漂亮的术语，而是为了减少重复、保持一致和支持扩展。',
+          '当前课程页面的重设计，本质上就在做这件事。',
+        ],
+      ),
+      createDocSection(
+        '设计 token 是最小稳定层',
+        [
+          '把颜色、字号、间距、阴影抽成变量，是最容易立刻见效的做法。',
+          '这样你改视觉方向时，不需要全项目到处搜值。',
+          '对于学习项目，CSS 变量已经足够好用，不必先上复杂方案。',
+        ],
+        undefined,
+        [
+          createCode(
+            '设计变量示例',
+            'css',
+            `:root {
+  --color-ink: #112018;
+  --color-surface: #f8f4ea;
+  --color-accent: #1d7a5b;
+  --space-4: 16px;
+  --radius-lg: 20px;
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '层级感来自结构，不只来自阴影',
+        [
+          '真正的层级感来自留白、对比、排版节奏和信息分组，而不只是给卡片加更大的阴影。',
+          '当课程内容从 6 章扩到 14 章后，信息层级是否清楚会直接决定可读性。',
+          '所以样式设计要服务于信息架构，而不是独立存在。',
+        ],
+      ),
+      createDocSection(
+        '响应式布局优先解决阅读顺序',
+        [
+          '移动端不是把元素简单压成一列，而是重新考虑阅读顺序和交互密度。',
+          '课程页尤其要注意侧栏、章节导航、代码块和长文本在窄屏上的表现。',
+          '如果桌面端好看但手机上难以阅读，这个设计就还不完整。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch12-design-tokens',
+        '练习 1：梳理一套页面设计变量',
+        '先统一基础变量，再谈组件风格。',
+        ['src/style.css'],
+        ['归并颜色、字号、间距、圆角和阴影', '删除明显重复的硬编码值', '让按钮、卡片、标签共享同一套规则'],
+        ['样式变量更统一', '重复值明显减少'],
+      ),
+      createExercise(
+        'ch12-phase-visual',
+        '练习 2：为四个阶段设计清晰视觉区分',
+        '让用户一眼知道自己处在哪个阶段。',
+        ['src/style.css', 'src/views/OverviewView.vue'],
+        ['给阶段设置稳定颜色和背景语言', '保持整体一致而不是四套互相冲突的风格', '在总览和章节页同时体现阶段信息'],
+        ['阶段识别度高', '整体视觉仍然统一'],
+      ),
+      createExercise(
+        'ch12-mobile-review',
+        '练习 3：专门检查移动端课程页',
+        '移动端是课程类产品最容易忽视的阅读场景。',
+        ['src/style.css'],
+        ['检查章节侧栏、标签页、代码块和资源卡片', '调整拥挤区域', '确保按钮和输入区易点按'],
+        ['移动端无明显布局破坏', '阅读顺序自然'],
+      ),
+    ],
+    milestone: '完成标准：你已经能用设计变量和信息层级来组织样式，而不是只会零散调颜色。',
+  },
+  {
+    id: 'chapter-13',
+    order: 13,
+    title: '第十三章：性能优化、测试策略与调试技巧',
+    subtitle: '会写还不够，还要会验证、会排错、会守住回归',
+    duration: '6 天',
+    phase: 'production',
+    summary: '这一章让你补齐交付能力。重点不是追求极限优化，而是知道何时该测、测什么、怎么查性能和状态问题。',
+    goals: ['建立基础性能分析和优化意识', '知道单元测试、组件测试和人工回归各自适用场景', '掌握常见的 Vue 调试路径'],
+    outcomes: ['能分析渲染过多、状态错乱、接口失败等问题', '能为关键逻辑设计最小验证策略'],
+    starterSteps: ['先从最常见的性能问题和回归点开始', '用构建、控制台、网络面板和 Vue Devtools 组合排查', '不要一上来就追逐微优化'],
+    docs: [
+      createDocSection(
+        '性能优化先看值不值得',
+        [
+          '如果页面本身没有卡顿、没有长列表、没有频繁重算，就不要先沉迷微优化。',
+          '真正该优先关注的是不必要的重复渲染、过大的数据结构和阻塞式请求。',
+          '优化应该基于观察和证据，而不是习惯性预优化。',
+        ],
+      ),
+      createDocSection(
+        '前端调试要建立固定路径',
+        [
+          '先看是否有报错，再看网络是否成功，再看状态是否变化，最后看模板是否正确消费了状态。',
+          '这个顺序能帮你避免一上来就怀疑框架。',
+          'Vue Devtools、浏览器 Network 面板和控制台日志是最常用三件套。',
+        ],
+      ),
+      createDocSection(
+        '测试策略要贴合风险点',
+        [
+          '不是所有学习项目都要马上补全自动化测试，但关键逻辑必须有验证方式。',
+          '对当前项目来说，构建检查、关键交互手测、章节切换、测验得分和持久化都属于高风险点。',
+          '先守住高风险路径，比追求测试数量更重要。',
+        ],
+        undefined,
+        [
+          createCode(
+            '最小验证清单',
+            'bash',
+            `npm run build
+# 然后手动检查：
+# 1. 章节切换
+# 2. 练习勾选持久化
+# 3. 测验提交与重做
+# 4. 资源页和总览页显示`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '会复盘，比会修一个 bug 更重要',
+        [
+          '每解决一个问题，都要总结它是数据问题、模板问题、样式问题还是架构问题。',
+          '这种分类能力会让你以后排错越来越快。',
+          '成熟开发者和新手的差距，很多时候不在于有没有遇到 bug，而在于有没有形成复盘模型。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch13-debug-flow',
+        '练习 1：写出你的固定排错路径',
+        '把模糊经验固化成可执行步骤。',
+        ['docs/LEARNING_PLAN.md'],
+        ['选一个你遇到过的前端问题', '写出排查顺序', '说明每一步看什么信息'],
+        ['路径可执行', '不是停留在“多试试”层面'],
+      ),
+      createExercise(
+        'ch13-regression-check',
+        '练习 2：整理课程平台的关键回归清单',
+        '把重要交互列出来，防止改版后无声回归。',
+        ['TODO.md'],
+        ['列出本项目最重要的 6 到 8 个交互', '按风险排序', '给出每项的最小验证方法'],
+        ['清单覆盖核心路径', '每项都可验证'],
+      ),
+      createExercise(
+        'ch13-perf-review',
+        '练习 3：检查一个可能的过度渲染点',
+        '练习从结构角度看性能。',
+        ['src/views/OverviewView.vue', 'src/views/ChapterView.vue'],
+        ['选一个复杂视图', '找出可能重复计算或重复渲染的区域', '记录你会如何优化以及为什么'],
+        ['结论有依据', '不是拍脑袋优化'],
+      ),
+    ],
+    milestone: '完成标准：你已经具备基本的验证、排错和性能判断能力，而不是只会继续写功能。',
+  },
+  {
+    id: 'chapter-14',
+    order: 14,
+    title: '第十四章：项目实战，构建完整的前端应用',
+    subtitle: '把前面十三章的知识收束到一个可展示、可交付的作品',
+    duration: '10 天',
+    phase: 'production',
+    summary: '最后一章是综合实战。目标不是再学新 API，而是把浏览器基础、Vue、类型、表单、请求、结构、样式和验证完整串起来。',
+    goals: ['完成一个有明确业务目标的前端作品', '能够说明项目结构、数据流、关键组件和技术决策', '形成自己的项目复盘和下一步升级计划'],
+    outcomes: ['拿得出一个可运行、可讲解、可继续扩展的 Vue 3 项目', '能把我会写一些页面提升为我能交付一个完整小项目'],
+    starterSteps: ['选一个你熟悉的后端业务场景作为题目', '先写需求范围和页面地图，再开工', '每完成一块就做一次小复盘，而不是最后一起返工'],
+    docs: [
+      createDocSection(
+        '选题比技术更重要',
+        [
+          '最佳选题是你熟悉业务但不熟悉前端实现的场景，例如用户管理、任务看板、内容后台或工单系统。',
+          '这样你不会被业务理解拖慢，可以把精力放在前端建模和页面交付上。',
+          '项目实战最怕的是题目太大或太空泛。',
+        ],
+      ),
+      createDocSection(
+        '项目最小闭环应该包含什么',
+        [
+          '至少要有一个列表页、一个详情或编辑页、一套基础表单、一次异步请求和一套统一视觉语言。',
+          '如果还能补上登录态、过滤器、空状态和错误反馈，完成度会明显更高。',
+          '闭环比功能数量重要，因为它更能体现你是否掌握完整流程。',
+        ],
+        undefined,
+        [
+          createCode(
+            '实战交付清单',
+            'bash',
+            `1. 明确页面地图
+2. 设计数据模型
+3. 拆布局和视图
+4. 接入表单与请求
+5. 完成样式和状态反馈
+6. 构建验证并复盘`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '如何讲清楚你的项目',
+        [
+          '能讲清楚项目结构、核心模块、数据流和技术取舍，比只展示界面更有说服力。',
+          '尤其对于从 Python 后端转前端的人，讲清为什么这样组织页面和状态会很加分。',
+          '这也是求职和团队协作中真正会被追问的部分。',
+        ],
+      ),
+      createDocSection(
+        '课程终点其实是新起点',
+        [
+          '完成这套课程后，你不会立刻变成资深前端，但你已经拥有独立交付小型 Vue 项目的能力框架。',
+          '接下来最有价值的事情不是再刷十套教程，而是持续做真实场景项目。',
+          '真正的能力会在项目复用、重构和迭代里被打磨出来。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch14-project-scope',
+        '练习 1：定义你的实战项目范围',
+        '控制范围是项目成功的一半。',
+        ['docs/LEARNING_PLAN.md'],
+        ['写出项目名称、目标用户和核心页面', '限定第一版只做最小闭环', '明确哪些需求暂时不做'],
+        ['项目目标清楚', '范围没有失控'],
+      ),
+      createExercise(
+        'ch14-build-demo',
+        '练习 2：完成一个可演示版本',
+        '不是做完所有想法，而是先交付一个能演示的版本。',
+        ['src/App.vue', 'src/views', 'src/components', 'src/style.css'],
+        ['完成核心流程', '补齐 loading、error 和空状态', '确保移动端和桌面端都可用'],
+        ['项目可运行可讲解', '核心流程完整'],
+      ),
+      createExercise(
+        'ch14-retro',
+        '练习 3：写最终复盘',
+        '把课程学习沉淀成自己的方法论。',
+        ['README.md'],
+        ['记录你做了什么项目', '总结三点做对的地方和三点要改进的地方', '写出下一步准备补强的方向'],
+        ['复盘具体', '对后续学习有指导价值'],
+      ),
+    ],
+    milestone: '完成标准：你能交付一个完整小项目，并清楚解释自己的结构设计、数据流和技术选择。',
   },
 ]
 
@@ -445,25 +1275,55 @@ export const learningResources: LearningResource[] = [
   {
     type: '官方文档',
     name: 'Vue 官方文档',
-    note: '优先阅读 Essentials、Reactivity Fundamentals、Component Basics。每学完一个概念，都回到项目里做最小实践。',
+    note: '优先阅读 Essentials、Reactivity Fundamentals、Component Basics 和 Best Practices，读完马上回到当前项目做最小实验。',
     link: 'https://vuejs.org/',
   },
   {
     type: '官方文档',
     name: 'TypeScript Handbook',
-    note: '重点阅读 Everyday Types、Functions、Generics，不需要一开始全部读完。',
+    note: '重点看 Everyday Types、Narrowing、More on Functions、Generics，不必一开始全读完。',
     link: 'https://www.typescriptlang.org/docs/',
   },
   {
     type: '基础参考',
     name: 'MDN Web Docs',
-    note: '遇到 HTML、CSS、DOM、事件、Fetch 等基础概念时，优先查 MDN。',
+    note: '遇到 DOM、事件、Fetch、CSS 布局和表单行为问题时，优先查 MDN，而不是先搜零散博客。',
     link: 'https://developer.mozilla.org/',
+  },
+  {
+    type: '调试工具',
+    name: 'Vue Devtools',
+    note: '用来观察组件树、props、事件和响应式状态，是 Vue 排错效率提升最明显的工具之一。',
+    link: 'https://devtools.vuejs.org/',
+  },
+  {
+    type: '视频课程',
+    name: 'Vue Mastery 免费基础资源',
+    note: '适合在卡住某个 Vue 概念时找一个短视频快速建立直觉，但不要替代动手练习。',
+    link: 'https://www.vuemastery.com/',
+  },
+  {
+    type: '工程实践',
+    name: 'Vite 官方文档',
+    note: '重点看 Guide、Features 和 Build，理解开发服务器、环境变量和构建产物。',
+    link: 'https://vite.dev/guide/',
+  },
+  {
+    type: '样式系统',
+    name: 'Every Layout',
+    note: '当你想补布局能力时，这套资源非常适合建立用约束组织页面的思维。',
+    link: 'https://every-layout.dev/',
   },
   {
     type: '练习建议',
     name: '自己的学习笔记',
-    note: '每章都记录“我今天学会了什么、哪里没懂、下一步准备改哪里”。这比囤教程更有用。',
+    note: '每章都记录今天做了什么、理解了什么、哪里还不稳定、下一步准备改什么，它比收藏更多链接更有价值。',
     link: 'https://developer.mozilla.org/zh-CN/docs/Learn',
+  },
+  {
+    type: '接口协作',
+    name: 'HTTP 状态码与 REST 设计参考',
+    note: '适合把你熟悉的后端接口经验映射到前端错误处理和状态反馈上。',
+    link: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Status',
   },
 ]

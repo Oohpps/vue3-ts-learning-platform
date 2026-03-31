@@ -22,7 +22,9 @@ const emit = defineEmits<{
         />
         <strong>{{ exercise.title }}</strong>
       </label>
-      <span class="exercise-state">{{ completed ? '已完成' : '待完成' }}</span>
+      <span class="exercise-state" :class="completed ? 'done' : 'pending'">
+        {{ completed ? '已完成' : '待完成' }}
+      </span>
     </div>
 
     <p class="exercise-intro">{{ exercise.intro }}</p>

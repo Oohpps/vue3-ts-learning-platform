@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { CourseChapter } from '../types/course'
+import { computed, ref } from 'vue'
+import type { CourseChapter, LearningPhaseMeta, QuizResult } from '../types/course'
 
-defineProps<{
+const props = defineProps<{
   chapters: CourseChapter[]
+  phases: LearningPhaseMeta[]
+  completedExercises: Record<string, boolean>
+  quizResults: Record<string, QuizResult>
   completedExerciseCount: number
   totalExerciseCount: number
+  passedQuizCount: number
+  totalQuizCount: number
 }>()
 
 const emit = defineEmits<{
@@ -15,111 +20,155 @@ const emit = defineEmits<{
 }>()
 
 const fileInput = ref<HTMLInputElement | null>(null)
+
+const nextChapter = computed(
+  () =>
+    props.chapters.find((chapter) =>
+      chapter.exercises.some((exercise) => !props.completedExercises[exercise.id]),
+    ) ?? props.chapters[0],
+)
+
+const phaseCards = computed(() =>
+  props.phases.map((phase) => {
+    const chapters = props.chapters.filter((chapter) => chapter.phase === phase.id)
+    const totalExercises = chapters.reduce((sum, chapter) => sum + chapter.exercises.length, 0)
+    const completed = chapters.reduce(
+      (sum, chapter) =>
+        sum + chapter.exercises.filter((exercise) => props.completedExercises[exercise.id]).length,
+      0,
+    )
+
+    return {
+      ...phase,
+      chapters,
+      completed,
+      totalExercises,
+    }
+  }),
+)
 </script>
 
 <template>
-  <section class="view-stack">
+  <section class="view-stack overview-page">
     <section class="overview-hero">
-      <div>
-        <h1>从零开始的 Vue 3 + TypeScript 学习台</h1>
+      <div class="hero-copy">
+        <p class="hero-kicker">14 Chapters · 4 Phases · Python to Frontend</p>
+        <h1>面向 Python 后端开发者的 Vue 3 进阶课程</h1>
         <p>
-          先建立页面、数据、交互之间的基本认知，再逐步进入类型、响应式和组件拆分。每一章都配有可直接在当前项目中完成的练习。
+          这不是零散教程集合，而是一条完整学习路线。你会从浏览器和状态驱动视图开始，一路走到组件复用、异步数据流、样式系统和项目实战。
         </p>
+
+        <div class="hero-actions">
+          <button class="secondary-button" type="button" @click="emit('openChapter', nextChapter.id)">
+            从 {{ nextChapter.title }} 开始
+          </button>
+          <button class="secondary-button outline" type="button" @click="emit('exportProgress')">
+            导出进度
+          </button>
+          <button class="secondary-button outline" type="button" @click="fileInput?.click()">
+            导入进度
+          </button>
+          <input
+            ref="fileInput"
+            type="file"
+            accept=".json"
+            hidden
+            @change="emit('importProgress', $event)"
+          />
+        </div>
       </div>
-      <div class="overview-stats">
-        <div class="stat-item">
+
+      <div class="hero-metrics">
+        <article class="metric-card">
           <strong>{{ chapters.length }}</strong>
-          <span>个学习章节</span>
-        </div>
-        <div class="stat-item">
+          <span>课程章节</span>
+        </article>
+        <article class="metric-card">
           <strong>{{ completedExerciseCount }}/{{ totalExerciseCount }}</strong>
-          <span>已完成练习</span>
-        </div>
-        <div class="stat-item">
-          <strong>6 周</strong>
-          <span>建议节奏</span>
-        </div>
+          <span>练习完成</span>
+        </article>
+        <article class="metric-card">
+          <strong>{{ passedQuizCount }}/{{ totalQuizCount }}</strong>
+          <span>测验通过</span>
+        </article>
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel overview-focus">
       <div class="panel-heading">
         <div>
-          <p class="section-kicker">Overview</p>
-          <h2>先知道现在应该学什么</h2>
+          <p class="section-kicker">Course Frame</p>
+          <h2>先看整条学习路线，再进入单章细读</h2>
         </div>
+        <p class="helper-copy">推荐顺序：基础入门 → 核心机制 → 应用架构 → 生产落地</p>
       </div>
 
-      <div class="summary-grid">
-        <article class="info-card highlight-card">
-          <p class="card-label">当前目标</p>
-          <h3>先看懂页面结构，再进入交互和组件</h3>
-          <p class="workspace-summary">
-            如果你是刚接触前端的新手，最重要的不是一下子学很多，而是让“页面结果”和“代码位置”
-            能稳定对应起来。
-          </p>
-        </article>
-
-        <article class="info-card stat-card">
-          <p class="card-label">练习完成度</p>
-          <strong>{{ completedExerciseCount }}/{{ totalExerciseCount }}</strong>
-          <p class="workspace-summary">建议每完成一章，就回到项目里至少做 2 个最小练习。</p>
-          <div class="progress-actions">
-            <button class="secondary-button" type="button" @click="emit('exportProgress')">
-              导出进度
-            </button>
-            <button class="secondary-button" type="button" @click="fileInput?.click()">
-              导入进度
-            </button>
-            <input
-              ref="fileInput"
-              type="file"
-              accept=".json"
-              style="display: none"
-              @change="emit('importProgress', $event)"
-            />
+      <div class="phase-roadmap">
+        <article
+          v-for="phase in phaseCards"
+          :key="phase.id"
+          class="phase-card"
+          :class="'phase-' + phase.id"
+        >
+          <span class="phase-badge" :class="phase.id">{{ phase.chapterRange }}</span>
+          <h3>{{ phase.title }}</h3>
+          <p class="phase-focus">{{ phase.focus }}</p>
+          <p class="workspace-summary">{{ phase.description }}</p>
+          <div class="phase-progress-line">
+            <span>{{ phase.completed }}/{{ phase.totalExercises }} 练习</span>
+            <span>{{ phase.chapters.length }} 章</span>
           </div>
         </article>
       </div>
+    </section>
 
-      <div class="starter-grid">
-        <article class="info-card">
-          <h3>新手建议的操作顺序</h3>
-          <ol class="ordered-list">
-            <li>先运行项目，确认你能看到页面并理解入口文件位置。</li>
-            <li>一次只改一个点，建立代码和页面结果的联系。</li>
-            <li>每章结束后写一句笔记：我今天真正理解了什么。</li>
-          </ol>
-        </article>
+    <section class="summary-grid">
+      <article class="panel runway-card">
+        <p class="section-kicker">Current Runway</p>
+        <h2>下一步建议</h2>
+        <p class="workspace-summary">
+          当前最推荐进入的是 <strong>{{ nextChapter.title }}</strong>。它会继续沿着课程节奏推进，不会让你跳过关键基础。
+        </p>
+        <button class="secondary-button" type="button" @click="emit('openChapter', nextChapter.id)">
+          打开章节
+        </button>
+      </article>
 
-        <article class="info-card">
-          <h3>这套学习台如何使用</h3>
-          <ul class="simple-list">
-            <li>在”章节学习”里逐章阅读目标、正文和练习。</li>
-            <li>在”学习资料”里控制资料范围，不要同时开太多教程。</li>
-            <li>所有练习进度和笔记自动保存在浏览器本地。</li>
-          </ul>
-        </article>
-      </div>
+      <article class="panel runway-card muted">
+        <p class="section-kicker">Study Method</p>
+        <h2>推荐使用方式</h2>
+        <ul class="simple-list">
+          <li>先看本章目标和完成标准，再读学习内容。</li>
+          <li>每章至少完成 2 个练习，再做章节测验。</li>
+          <li>测验和笔记都只是反馈手段，真正的掌握来自动手改项目。</li>
+        </ul>
+      </article>
     </section>
 
     <section class="panel">
       <div class="panel-heading">
         <div>
-          <p class="section-kicker">Chapters</p>
-          <h2>章节预览</h2>
+          <p class="section-kicker">All Chapters</p>
+          <h2>按章节进入课程</h2>
         </div>
       </div>
 
       <div class="chapter-preview-grid">
-        <article v-for="chapter in chapters" :key="chapter.id" class="info-card chapter-preview-card">
-          <p class="chapter-order">Chapter {{ chapter.order }} · {{ chapter.duration }}</p>
+        <article
+          v-for="chapter in chapters"
+          :key="chapter.id"
+          class="chapter-preview-card"
+          :class="'phase-' + chapter.phase"
+        >
+          <p class="chapter-order" :class="'phase-' + chapter.phase">
+            Chapter {{ chapter.order }} · {{ chapter.duration }}
+          </p>
           <h3>{{ chapter.title }}</h3>
           <p class="workspace-summary">{{ chapter.summary }}</p>
           <ul class="simple-list">
             <li v-for="goal in chapter.goals.slice(0, 2)" :key="goal">{{ goal }}</li>
           </ul>
-          <button class="secondary-button" type="button" @click="emit('openChapter', chapter.id)">
+          <button class="secondary-button outline" type="button" @click="emit('openChapter', chapter.id)">
             进入本章
           </button>
         </article>

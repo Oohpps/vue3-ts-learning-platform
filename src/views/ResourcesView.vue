@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { LearningResource } from '../types/course'
+import type { LearningPhaseMeta, LearningResource } from '../types/course'
 
 defineProps<{
   resources: LearningResource[]
+  phases: LearningPhaseMeta[]
 }>()
 </script>
 
@@ -11,25 +12,43 @@ defineProps<{
     <section class="panel">
       <div class="panel-heading">
         <div>
-          <p class="section-kicker">Resources</p>
-          <h2>资料不用多，关键是知道什么时候看什么</h2>
+          <p class="section-kicker">Resource Map</p>
+          <h2>资料不是越多越好，关键是知道什么时候看什么</h2>
+        </div>
+      </div>
+
+      <div class="phase-roadmap compact">
+        <article v-for="phase in phases" :key="phase.id" class="phase-card" :class="'phase-' + phase.id">
+          <span class="phase-badge" :class="phase.id">{{ phase.chapterRange }}</span>
+          <h3>{{ phase.title }}</h3>
+          <p class="phase-focus">{{ phase.focus }}</p>
+          <p class="workspace-summary">{{ phase.description }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">Reading Rules</p>
+          <h2>推荐使用方式</h2>
         </div>
       </div>
 
       <div class="starter-grid">
         <article class="info-card">
-          <h3>资料使用建议</h3>
+          <h3>查资料顺序</h3>
           <ul class="simple-list">
-            <li>遇到 Vue 语法问题，先查 Vue 官方文档，不要先搜零散答案。</li>
-            <li>遇到 HTML、CSS、DOM、事件等基础问题，优先查 MDN。</li>
-            <li>不要同时追很多视频和文章，先把一个概念在当前项目里练出来。</li>
+            <li>Vue 语法问题先查 Vue 官方文档。</li>
+            <li>HTML、CSS、DOM 和 Fetch 优先查 MDN。</li>
+            <li>类型问题优先查 TypeScript Handbook。</li>
+            <li>每次查完都回到当前项目做一个最小实验。</li>
           </ul>
         </article>
-
         <article class="info-card">
-          <h3>笔记比囤资料更重要</h3>
+          <h3>笔记比收藏更重要</h3>
           <p class="workspace-summary">
-            每次学习后写 3 句话就够了：今天改了什么、理解了什么、还有什么没搞懂。这样比收藏更多链接更有效。
+            每次学习后写三句话就够了：今天改了什么、真正理解了什么、还有哪里不稳定。这样的笔记比只保存链接更能沉淀能力。
           </p>
         </article>
       </div>

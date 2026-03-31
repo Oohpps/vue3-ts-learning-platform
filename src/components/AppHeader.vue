@@ -5,16 +5,17 @@ defineProps<{
   activeView: AppView
   completedExerciseCount: number
   totalExerciseCount: number
+  overallProgress: number
 }>()
 
 const emit = defineEmits<{
   navigate: [view: AppView]
 }>()
 
-const navItems: Array<{ id: AppView; label: string }> = [
-  { id: 'overview', label: '学习总览' },
-  { id: 'chapter', label: '章节学习' },
-  { id: 'resources', label: '学习资料' },
+const navItems: Array<{ id: AppView; label: string; note: string }> = [
+  { id: 'overview', label: '课程总览', note: '看路线和阶段' },
+  { id: 'chapter', label: '章节学习', note: '进入当前章节' },
+  { id: 'resources', label: '学习资源', note: '查文档和外部资料' },
 ]
 </script>
 
@@ -22,9 +23,13 @@ const navItems: Array<{ id: AppView; label: string }> = [
   <header class="top-bar">
     <div class="top-bar-inner">
       <div class="brand">
-        <span class="brand-icon">V</span>
-        <span class="brand-title">Vue 3 + TS 学习台</span>
+        <span class="brand-icon">V3</span>
+        <div>
+          <p class="brand-kicker">Frontend Learning System</p>
+          <strong class="brand-title">Vue 3 + TypeScript 课程</strong>
+        </div>
       </div>
+
       <nav class="main-nav">
         <button
           v-for="item in navItems"
@@ -34,12 +39,19 @@ const navItems: Array<{ id: AppView; label: string }> = [
           type="button"
           @click="emit('navigate', item.id)"
         >
-          {{ item.label }}
+          <span>{{ item.label }}</span>
+          <small>{{ item.note }}</small>
         </button>
       </nav>
+
       <div class="progress-badge">
-        {{ completedExerciseCount }} / {{ totalExerciseCount }} 已完成
+        <strong>{{ overallProgress }}%</strong>
+        <span>{{ completedExerciseCount }} / {{ totalExerciseCount }} 练习</span>
       </div>
+    </div>
+
+    <div class="top-progress">
+      <div class="top-progress-fill" :style="{ width: overallProgress + '%' }" />
     </div>
   </header>
 </template>

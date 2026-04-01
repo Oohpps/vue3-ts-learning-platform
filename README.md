@@ -87,3 +87,6 @@ docs/
 ## License
 
 MIT
+
+### 扫描二维码访问本项目
+![Repository QR Code](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/Oohpps/vue3-ts-learning-platform.git&color=3178c6)

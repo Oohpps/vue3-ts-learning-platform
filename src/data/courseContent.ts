@@ -36,7 +36,7 @@ export const learningPhases: LearningPhaseMeta[] = [
     id: 'foundations',
     title: '基础入门',
     focus: '先把浏览器、JavaScript、CSS、TypeScript 和 Vue 响应式串起来',
-    description: '适合从 Python 后端转前端的人，重点不是背 API，而是建立页面如何响应状态变化的直觉。',
+    description: '重点不是背 API，而是建立页面如何响应状态变化的直觉。',
     chapterRange: 'Chapter 1-5',
   },
   {
@@ -132,7 +132,7 @@ createApp(App).mount('#app')`,
         ],
       ),
       createDocSection(
-        '从 Python 后端视角理解页面加载',
+        '从服务端渲染视角理解页面加载',
         [
           '如果你熟悉 Django 或 Flask 模板，可以把 `index.html` 理解成壳页面，但 Vue 会继续在浏览器里接管后续渲染。',
           '后端模板是服务端一次性生成 HTML，SPA 则是在客户端根据状态不断重绘视图。',
@@ -300,7 +300,7 @@ btn.addEventListener('click', () => {
     subtitle: '掌握 Flexbox 和 Grid，让页面不再是一堆挤在一起的方块',
     duration: '3 天',
     phase: 'foundations',
-    summary: '这一章补齐布局能力。Python 后端开发者通常没有系统学过 CSS 布局，但这是前端开发的基础中的基础。',
+    summary: '这一章补齐布局能力。CSS 布局是前端开发的基础中的基础，无论你的技术背景如何，系统掌握 Flexbox 和 Grid 都非常必要。',
     goals: [
       '理解盒模型、display 属性和文档流的基本概念',
       '掌握 Flexbox 核心属性，能实现常见的水平排列、居中和等分布局',
@@ -1831,7 +1831,7 @@ it('应该使用初始值', () => {
         '如何讲清楚你的项目',
         [
           '能讲清楚项目结构、核心模块、数据流和技术取舍，比只展示界面更有说服力。',
-          '尤其对于从 Python 后端转前端的人，讲清为什么这样组织页面和状态会很加分。',
+          '能讲清为什么这样组织页面和状态，比单纯展示界面更能体现工程能力。',
           '这也是求职和团队协作中真正会被追问的部分。',
         ],
       ),

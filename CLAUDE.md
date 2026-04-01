@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目简介
 
-面向 Python 后端开发者的 Vue 3 + TypeScript 入门学习项目。当前已实现为一个可交互的章节学习台，支持章节切换、练习勾选、笔记记录和本地持久化。
+Vue 3 + TypeScript 交互式学习平台。提供 17 个章节的完整学习路线，支持章节切换、代码练习、测验系统、笔记记录和本地持久化。
 
 ## 常用命令
 

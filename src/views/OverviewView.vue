@@ -48,8 +48,8 @@ const phaseCards = computed(() =>
   <section class="view-stack overview-page">
     <section class="overview-hero">
       <div class="hero-copy">
-        <p class="hero-kicker">14 Chapters · 4 Phases · Python to Frontend</p>
-        <h1>面向 Python 后端开发者的 Vue 3 进阶课程</h1>
+        <p class="hero-kicker">17 Chapters · 4 Phases · Zero to Production</p>
+        <h1>Vue 3 + TypeScript 交互式学习平台</h1>
         <p>
           这不是零散教程集合，而是一条完整学习路线。你会从浏览器和状态驱动视图开始，一路走到组件复用、异步数据流、样式系统和项目实战。
         </p>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import type { CourseChapter, LearningPhaseMeta, QuizResult } from '../types/course'
 
 const props = defineProps<{
@@ -15,11 +15,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   openChapter: [chapterId: string]
-  exportProgress: []
-  importProgress: [event: Event]
 }>()
-
-const fileInput = ref<HTMLInputElement | null>(null)
 
 const nextChapter = computed(
   () =>
@@ -62,19 +58,6 @@ const phaseCards = computed(() =>
           <button class="secondary-button" type="button" @click="emit('openChapter', nextChapter.id)">
             从 {{ nextChapter.title }} 开始
           </button>
-          <button class="secondary-button outline" type="button" @click="emit('exportProgress')">
-            导出进度
-          </button>
-          <button class="secondary-button outline" type="button" @click="fileInput?.click()">
-            导入进度
-          </button>
-          <input
-            ref="fileInput"
-            type="file"
-            accept=".json"
-            hidden
-            @change="emit('importProgress', $event)"
-          />
         </div>
       </div>
 

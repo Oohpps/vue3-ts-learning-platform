@@ -35,30 +35,30 @@ export const learningPhases: LearningPhaseMeta[] = [
   {
     id: 'foundations',
     title: '基础入门',
-    focus: '先把浏览器、JavaScript、TypeScript 和 Vue 响应式串起来',
+    focus: '先把浏览器、JavaScript、CSS、TypeScript 和 Vue 响应式串起来',
     description: '适合从 Python 后端转前端的人，重点不是背 API，而是建立页面如何响应状态变化的直觉。',
-    chapterRange: 'Chapter 1-4',
+    chapterRange: 'Chapter 1-5',
   },
   {
     id: 'core',
     title: '核心机制',
-    focus: '把组件拆分、逻辑复用、表单处理做扎实',
+    focus: '把组件拆分、生命周期、逻辑复用、表单处理做扎实',
     description: '从能写页面，提升到能组织一个中小型 Vue 应用，开始形成模块边界和工程习惯。',
-    chapterRange: 'Chapter 5-8',
+    chapterRange: 'Chapter 6-9',
   },
   {
     id: 'architecture',
     title: '应用架构',
     focus: '进入路由、状态管理、异步数据和类型体系',
     description: '这一阶段不再停留在 demo，而是开始接近真实业务系统的页面结构和数据流。',
-    chapterRange: 'Chapter 9-11',
+    chapterRange: 'Chapter 10-14',
   },
   {
     id: 'production',
     title: '生产落地',
     focus: '补齐样式工程、性能、测试和项目交付',
     description: '目标是做出可以展示、可以复盘、可以继续演进的前端项目，而不是只停留在教程练习。',
-    chapterRange: 'Chapter 12-14',
+    chapterRange: 'Chapter 15-17',
   },
 ]
 
@@ -164,13 +164,23 @@ createApp(App).mount('#app')`,
     id: 'chapter-2',
     order: 2,
     title: '第二章：JavaScript 基础与页面交互',
-    subtitle: '先理解变量、数组、对象和函数，再理解页面为什么会动',
-    duration: '3 天',
+    subtitle: '先理解变量、数组、对象和函数，再用原生 JS 操纵页面',
+    duration: '4 天',
     phase: 'foundations',
-    summary: '这一章解决“交互从哪里来”。你需要把页面变化抽象成状态变化，而不是把界面看成一堆零散标签。',
-    goals: ['熟悉变量、数组、对象、函数和条件判断', '理解按钮点击、筛选和切换背后其实是状态更新', '开始把页面数据看成对象和数组，而不是直接拼模板'],
-    outcomes: ['能写出搜索、计数、切换这种基础交互', '能把一段 UI 需求先翻译成数据结构和规则'],
-    starterSteps: ['先写出页面里哪些数据会变化，哪些不会变化', '把章节、资源、练习看成数组和对象', '练习用数组方法驱动界面结果，而不是手写重复内容'],
+    summary: '这一章解决”交互从哪里来”。你需要把页面变化抽象成状态变化，同时体验原生 DOM 操作，为后续理解 Vue 的价值打下基础。',
+    goals: [
+      '熟悉变量、数组、对象、函数和条件判断',
+      '理解按钮点击、筛选和切换背后其实是状态更新',
+      '体验原生 DOM 查询和事件监听，感受手动操作的繁琐',
+      '开始把页面数据看成对象和数组，而不是直接拼模板',
+    ],
+    outcomes: ['能写出搜索、计数、切换这种基础交互', '能把一段 UI 需求先翻译成数据结构和规则', '能解释原生 DOM 操作的痛点，理解为什么需要框架'],
+    starterSteps: [
+      '先写出页面里哪些数据会变化，哪些不会变化',
+      '把章节、资源、练习看成数组和对象',
+      '练习用数组方法驱动界面结果，而不是手写重复内容',
+      '用浏览器控制台手写几行 DOM 操作，感受一下',
+    ],
     docs: [
       createDocSection(
         '页面交互本质是状态变化',
@@ -209,6 +219,32 @@ const result = items.filter((item) =>
         ],
       ),
       createDocSection(
+        '原生 DOM 操作：先体验痛苦，再理解框架',
+        [
+          '在没有 Vue 之前，前端开发者需要手动查找 DOM 节点、绑定事件、拼接 HTML 字符串来更新页面。',
+          '`document.querySelector` 找节点，`addEventListener` 绑事件，`textContent` 或 `innerHTML` 改内容，这些是原生三件套。',
+          '当页面只有一两个交互时还能应付，一旦状态多起来、列表需要动态增删，代码会迅速失控。',
+          '先体验这种繁琐，后面学 Vue 响应式时你才会真正理解它解决了什么问题。',
+        ],
+        ['原生 DOM 操作是理解框架价值的基础', '不需要精通，但要写过'],
+        [
+          createCode(
+            '原生 JS 操作 DOM',
+            'js',
+            `// 找到按钮和计数显示区
+const btn = document.querySelector('#count-btn')
+const display = document.querySelector('#count-display')
+let count = 0
+
+// 手动绑定事件、手动更新 DOM
+btn.addEventListener('click', () => {
+  count++
+  display.textContent = \`点击了 \${count} 次\`
+})`,
+          ),
+        ],
+      ),
+      createDocSection(
         '异步基础不要跳过',
         [
           '哪怕你现在还没正式写接口，请先熟悉 Promise 和 `async/await` 的思路。',
@@ -240,19 +276,198 @@ const result = items.filter((item) =>
       ),
       createExercise(
         'ch2-toggle',
-        '练习 2：增加“只看未完成”开关',
+        '练习 2：增加”只看未完成”开关',
         '练习布尔状态和条件过滤。',
         ['src/App.vue', 'src/views/OverviewView.vue'],
         ['增加布尔状态保存过滤条件', '只展示还有未完成练习的章节', '在界面显示当前可见章节数'],
         ['开关切换时界面立即更新', '计数结果和列表一致'],
       ),
+      createExercise(
+        'ch2-dom-practice',
+        '练习 3：用原生 JS 写一个计数器',
+        '在浏览器控制台或临时 HTML 文件中体验手动 DOM 操作，为后续理解 Vue 做铺垫。',
+        ['index.html', '浏览器控制台'],
+        ['在控制台用 querySelector 找到页面上的一个元素', '用 addEventListener 绑定点击事件', '手动更新元素的 textContent'],
+        ['你能解释每一步在做什么', '你能说出这种方式的痛点'],
+      ),
     ],
-    milestone: '完成标准：你开始把交互问题理解成“状态 + 规则”，而不是堆按钮和事件。',
+    milestone: '完成标准：你开始把交互问题理解成”状态 + 规则”，并且体验过原生 DOM 操作的繁琐。',
   },
   {
     id: 'chapter-3',
     order: 3,
-    title: '第三章：TypeScript 与前端数据建模',
+    title: '第三章：CSS 布局基础',
+    subtitle: '掌握 Flexbox 和 Grid，让页面不再是一堆挤在一起的方块',
+    duration: '3 天',
+    phase: 'foundations',
+    summary: '这一章补齐布局能力。Python 后端开发者通常没有系统学过 CSS 布局，但这是前端开发的基础中的基础。',
+    goals: [
+      '理解盒模型、display 属性和文档流的基本概念',
+      '掌握 Flexbox 核心属性，能实现常见的水平排列、居中和等分布局',
+      '了解 Grid 基础，能搭建简单的网格结构',
+      '建立响应式布局意识，知道媒体查询的基本用法',
+    ],
+    outcomes: [
+      '能用 Flexbox 实现导航栏、卡片列表、居中布局等常见结构',
+      '能解释为什么某个元素没有按预期排列',
+    ],
+    starterSteps: [
+      '先搞清楚块级元素和行内元素的区别',
+      '从 Flexbox 的主轴和交叉轴开始理解，不要背所有属性',
+      '在当前项目的 style.css 中找到 Flexbox 用法并理解它们',
+    ],
+    docs: [
+      createDocSection(
+        '盒模型：一切布局的起点',
+        [
+          '每个 HTML 元素都是一个矩形盒子，由内容区、内边距（padding）、边框（border）和外边距（margin）组成。',
+          '默认情况下，你设置的 width 只包含内容区，加上 padding 和 border 后实际宽度会更大。',
+          '`box-sizing: border-box` 让 width 包含 padding 和 border，这是现代开发几乎必加的设置。',
+        ],
+        undefined,
+        [
+          createCode(
+            '盒模型设置',
+            'css',
+            `/* 推荐全局设置 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 这样设置 width: 200px 后，
+   实际宽度就是 200px，
+   不用再手动减 padding 和 border */`,
+          ),
+        ],
+      ),
+      createDocSection(
+        'Flexbox：解决 80% 的布局问题',
+        [
+          'Flexbox 是一维布局方案，适合在一行或一列中排列元素。',
+          '核心概念是主轴和交叉轴：`flex-direction` 决定主轴方向，`justify-content` 控制主轴排列，`align-items` 控制交叉轴对齐。',
+          '最常用的组合：水平居中（`justify-content: center` + `align-items: center`）、两端对齐（`justify-content: space-between`）、等分（`gap` + 去掉固定宽度）。',
+        ],
+        [
+          '主轴方向由 flex-direction 决定',
+          'justify-content 管主轴，align-items 管交叉轴',
+          'gap 是最简洁的元素间距方案',
+        ],
+        [
+          createCode(
+            'Flexbox 常见用法',
+            'css',
+            `/* 水平居中 */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 导航栏：左右两端对齐 */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 卡片列表：自动换行 + 间距 */
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.card {
+  flex: 1;
+  min-width: 280px;
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        'Grid：当你需要二维控制',
+        [
+          'Grid 是二维布局方案，适合需要同时控制行和列的场景，例如仪表盘、图片墙和复杂页面框架。',
+          '入门阶段不需要掌握所有 Grid 属性，`grid-template-columns`、`gap` 和 `fr` 单位就够用了。',
+          '一个常见的判断标准：如果 Flexbox 已经能清晰解决问题，就不必硬上 Grid。',
+        ],
+        undefined,
+        [
+          createCode(
+            'Grid 基础',
+            'css',
+            `/* 三列等分布局 */
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* 自适应列数 */
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '响应式布局：不是缩成一列就完事',
+        [
+          '响应式不是让所有东西在小屏幕上堆成一列，而是重新考虑阅读顺序和交互密度。',
+          '媒体查询（`@media`）是最基础的响应式手段，根据屏幕宽度应用不同样式。',
+          '对 Python 开发者来说，可以类比后端根据不同客户端返回不同模板，只是在前端用 CSS 完成。',
+        ],
+        undefined,
+        [
+          createCode(
+            '媒体查询示例',
+            'css',
+            `/* 移动端优先 */
+.sidebar {
+  display: none;
+}
+
+/* 桌面端 */
+@media (min-width: 768px) {
+  .sidebar {
+    display: block;
+    width: 260px;
+  }
+
+  .main {
+    display: flex;
+  }
+}`,
+          ),
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch3-flexbox-nav',
+        '练习 1：用 Flexbox 重做导航栏',
+        '把课程平台的顶部导航栏改成纯 Flexbox 实现，理解每行 CSS 在做什么。',
+        ['src/style.css', 'src/components/AppHeader.vue'],
+        ['找到导航栏相关的样式代码', '确认 flex、justify-content、align-items 各自的作用', '试着修改对齐方式，观察变化'],
+        ['你能解释导航栏每个 flex 属性的作用', '修改属性后布局变化符合预期'],
+      ),
+      createExercise(
+        'ch3-layout-practice',
+        '练习 2：练习卡片列表布局',
+        '用 Flexbox 或 Grid 实现一个自适应的卡片列表。',
+        ['src/style.css', 'src/views/OverviewView.vue'],
+        ['让章节预览卡片在不同宽度下自动换行', '用 gap 控制间距', '在窄屏下单列显示'],
+        ['窗口缩小时卡片自动重排', '间距统一且不拥挤'],
+      ),
+    ],
+    milestone: '完成标准：你看到一张页面布局图，能判断该用 Flexbox 还是 Grid，并写出基本样式。',
+  },
+  {
+    id: 'chapter-4',
+    order: 4,
+    title: '第四章：TypeScript 与前端数据建模',
     subtitle: '先学够用的类型，再让编辑器帮你守住结构',
     duration: '3 天',
     phase: 'foundations',
@@ -329,9 +544,9 @@ interface PageModel {
     milestone: '完成标准：你已经能先想数据结构，再用类型把结构固定下来。',
   },
   {
-    id: 'chapter-4',
-    order: 4,
-    title: '第四章：Vue 3 响应式、模板与计算属性',
+    id: 'chapter-5',
+    order: 5,
+    title: '第五章：Vue 3 响应式、模板与计算属性',
     subtitle: '从“改 DOM”切换到“改状态”',
     duration: '4 天',
     phase: 'foundations',
@@ -388,7 +603,7 @@ const progress = computed(() => {
     ],
     exercises: [
       createExercise(
-        'ch4-summary-card',
+        'ch5-summary-card',
         '练习 1：做一个学习进度摘要卡片',
         '练习从已有状态中推导 UI 结果。',
         ['src/views/OverviewView.vue', 'src/App.vue'],
@@ -396,7 +611,7 @@ const progress = computed(() => {
         ['勾选练习后摘要会同步变化', '模板保持可读'],
       ),
       createExercise(
-        'ch4-note',
+        'ch5-note',
         '练习 2：为每章增加“今日收获”输入框',
         '练习 `v-model` 和章节级状态切换。',
         ['src/views/ChapterView.vue', 'src/App.vue'],
@@ -407,16 +622,31 @@ const progress = computed(() => {
     milestone: '完成标准：你已经能用“状态驱动视图”的方式写页面，而不是手动改 DOM。',
   },
   {
-    id: 'chapter-5',
-    order: 5,
-    title: '第五章：组件拆分与项目结构',
+    id: 'chapter-6',
+    order: 6,
+    title: '第六章：组件拆分、生命周期与项目结构',
     subtitle: '从一个大页面走向职责清晰的模块化结构',
-    duration: '4 天',
+    duration: '5 天',
     phase: 'core',
-    summary: '这一章关注结构设计。你会开始知道什么时候该拆组件、什么时候该拆视图、什么时候该拆数据模块。',
-    goals: ['识别可复用视图块和重复结构', '掌握 `props`、事件回传和插槽的基本协作方式', '初步建立按功能和职责组织目录的习惯'],
-    outcomes: ['能把大页面拆成头部、侧栏、内容区和功能卡片', '能避免把所有逻辑继续堆在 `App.vue` 里'],
-    starterSteps: ['先从重复 UI 下手拆组件', '再把整页内容拆成视图组件', '最后把纯数据和纯逻辑移动到独立模块'],
+    summary: '这一章关注结构设计和生命周期。你会开始知道什么时候该拆组件、什么时候该拆视图、组件挂载和销毁时该做什么。',
+    goals: [
+      '识别可复用视图块和重复结构',
+      '掌握 `props`、事件回传和插槽的基本协作方式',
+      '理解 `onMounted`、`onUnmounted` 等生命周期钩子的使用场景',
+      '掌握模板 ref 的基本用法',
+      '初步建立按功能和职责组织目录的习惯',
+    ],
+    outcomes: [
+      '能把大页面拆成头部、侧栏、内容区和功能卡片',
+      '能避免把所有逻辑继续堆在 `App.vue` 里',
+      '能在组件挂载时执行初始化、销毁时执行清理',
+    ],
+    starterSteps: [
+      '先从重复 UI 下手拆组件',
+      '再把整页内容拆成视图组件',
+      '最后把纯数据和纯逻辑移动到独立模块',
+      '思考每个组件挂载和销毁时需要做什么',
+    ],
     docs: [
       createDocSection(
         '拆分不是为了文件更多',
@@ -462,10 +692,75 @@ const emit = defineEmits<{
           '这也是后续做接口替换时最常见的准备动作。',
         ],
       ),
+      createDocSection(
+        '组件生命周期：挂载时做什么，销毁时做什么',
+        [
+          '每个 Vue 组件都有自己的生命周期：创建、挂载到 DOM、更新、卸载。',
+          '`onMounted` 是最常用的钩子，适合执行初始化操作，比如获取数据、设置定时器或操作 DOM。',
+          '`onUnmounted` 用于清理工作，比如清除定时器、移除事件监听或取消请求，防止内存泄漏。',
+          '如果你在 `onMounted` 里创建了需要手动清理的资源，就必须在 `onUnmounted` 里释放它。',
+        ],
+        ['onMounted 做初始化', 'onUnmounted 做清理', '配对使用，不要遗漏'],
+        [
+          createCode(
+            '生命周期钩子基本用法',
+            'vue',
+            `<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
+
+const time = ref('')
+
+let timer: number | undefined
+
+onMounted(() => {
+  // 挂载后启动定时器
+  timer = window.setInterval(() => {
+    time.value = new Date().toLocaleTimeString()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  // 销毁时清除定时器，防止内存泄漏
+  if (timer) clearInterval(timer)
+})
+</script>`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '模板 ref：当你确实需要访问 DOM',
+        [
+          '通常 Vue 会帮你处理 DOM 更新，但有时你需要直接访问 DOM 节点，比如聚焦输入框或测量元素尺寸。',
+          '模板 ref 通过 `ref` 属性和同名的响应式变量建立关联，组件挂载后就能拿到真实 DOM 节点。',
+          '只能在 `onMounted` 及之后访问模板 ref，因为挂载前 DOM 还不存在。',
+        ],
+        undefined,
+        [
+          createCode(
+            '模板 ref 基本用法',
+            'vue',
+            `<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+// 声明一个和模板中 ref 同名的变量
+const inputEl = ref<HTMLInputElement | null>(null)
+
+onMounted(() => {
+  // 挂载后自动聚焦
+  inputEl.value?.focus()
+})
+</script>
+
+<template>
+  <input ref="inputEl" placeholder="自动聚焦" />
+</template>`,
+          ),
+        ],
+      ),
     ],
     exercises: [
       createExercise(
-        'ch5-sidebar',
+        'ch6-sidebar',
         '练习 1：重做章节侧栏分组',
         '把侧栏从简单列表升级为带阶段分组的导航。',
         ['src/components/ChapterSidebar.vue', 'src/style.css'],
@@ -473,20 +768,28 @@ const emit = defineEmits<{
         ['侧栏更清晰', '现有导航功能无回归'],
       ),
       createExercise(
-        'ch5-layout',
+        'ch6-layout',
         '练习 2：把总览页拆成多个信息板块',
         '练习在一个页面里组织多个职责明确的组件区块。',
         ['src/views/OverviewView.vue', 'src/style.css'],
         ['区分课程介绍、阶段路线、进度统计和推荐起步动作', '给每个板块一个明确标题', '避免所有信息塞在同一张卡片里'],
         ['总览结构更清楚', '每个板块都有独立意图'],
       ),
+      createExercise(
+        'ch6-lifecycle',
+        '练习 3：给章节页增加自动聚焦',
+        '练习 onMounted 和模板 ref，切换到章节页时自动聚焦笔记输入框。',
+        ['src/views/ChapterView.vue'],
+        ['给笔记输入框添加模板 ref', '在 onMounted 中实现自动聚焦', '确保切换章节时聚焦逻辑正常工作'],
+        ['进入章节页后笔记框自动获得焦点', '能解释为什么要在 onMounted 而不是 setup 阶段操作 DOM'],
+      ),
     ],
-    milestone: '完成标准：你已经能把页面拆成有边界的模块，而不是继续扩张单个大文件。',
+    milestone: '完成标准：你已经能把页面拆成有边界的模块，并知道组件挂载和销毁时该做什么。',
   },
   {
-    id: 'chapter-6',
-    order: 6,
-    title: '第六章：响应式进阶、watch 与副作用',
+    id: 'chapter-7',
+    order: 7,
+    title: '第七章：响应式进阶、watch 与副作用',
     subtitle: '开始区分状态、派生结果和副作用处理',
     duration: '4 天',
     phase: 'core',
@@ -540,7 +843,7 @@ const emit = defineEmits<{
     ],
     exercises: [
       createExercise(
-        'ch6-watch-storage',
+        'ch7-watch-storage',
         '练习 1：自己实现一个最小 `watch` 持久化',
         '不要先看 composable，先亲手把监听和存储串一遍。',
         ['src/App.vue', 'src/composables/useLocalStorage.ts'],
@@ -548,7 +851,7 @@ const emit = defineEmits<{
         ['状态刷新后保留', '没有把副作用写进 `computed`'],
       ),
       createExercise(
-        'ch6-reactive-boundary',
+        'ch7-reactive-boundary',
         '练习 2：验证 reactive 解构边界',
         '用一个最小实验理解为什么有时界面不更新。',
         ['src/views/ChapterView.vue'],
@@ -559,9 +862,9 @@ const emit = defineEmits<{
     milestone: '完成标准：你能区分纯计算和副作用，也知道 watch 该在什么场景出手。',
   },
   {
-    id: 'chapter-7',
-    order: 7,
-    title: '第七章：Composables 与逻辑复用',
+    id: 'chapter-8',
+    order: 8,
+    title: '第八章：Composables 与逻辑复用',
     subtitle: '把重复的状态管理和副作用提炼成可复用模块',
     duration: '5 天',
     phase: 'core',
@@ -622,7 +925,7 @@ export function useKeywordFilter(items: string[]) {
     ],
     exercises: [
       createExercise(
-        'ch7-extract-filter',
+        'ch8-extract-filter',
         '练习 1：抽取章节搜索 composable',
         '把总览页或侧栏的搜索逻辑提炼为可复用模块。',
         ['src/composables/useChapterFilter.ts', 'src/views/OverviewView.vue'],
@@ -630,7 +933,7 @@ export function useKeywordFilter(items: string[]) {
         ['功能保持正常', '视图代码更短更清楚'],
       ),
       createExercise(
-        'ch7-extract-progress',
+        'ch8-extract-progress',
         '练习 2：抽取学习进度统计 composable',
         '把练习统计和测验统计从视图中剥离出来。',
         ['src/composables/useLearningProgress.ts', 'src/App.vue'],
@@ -638,7 +941,7 @@ export function useKeywordFilter(items: string[]) {
         ['多个页面展示一致', '视图中减少重复统计逻辑'],
       ),
       createExercise(
-        'ch7-composable-review',
+        'ch8-composable-review',
         '练习 3：审查现有 composable 的 API',
         '不是所有 composable 都需要重写，但需要学会判断 API 是否合理。',
         ['src/composables/useLocalStorage.ts'],
@@ -649,9 +952,9 @@ export function useKeywordFilter(items: string[]) {
     milestone: '完成标准：你已经能把重复逻辑从页面里抽出，并且保持清晰边界。',
   },
   {
-    id: 'chapter-8',
-    order: 8,
-    title: '第八章：表单处理、用户输入与数据校验',
+    id: 'chapter-9',
+    order: 9,
+    title: '第九章：表单处理、用户输入与数据校验',
     subtitle: '别把表单看成一堆输入框，它本质上是状态机',
     duration: '5 天',
     phase: 'core',
@@ -713,7 +1016,7 @@ function validate(form: LoginForm) {
     ],
     exercises: [
       createExercise(
-        'ch8-login-form',
+        'ch9-login-form',
         '练习 1：做一个登录表单',
         '用最小业务场景练习输入、校验和提交状态。',
         ['src/views/ChapterView.vue', 'src/style.css'],
@@ -721,7 +1024,7 @@ function validate(form: LoginForm) {
         ['无效输入无法提交', '提交中不能重复点击'],
       ),
       createExercise(
-        'ch8-profile-form',
+        'ch9-profile-form',
         '练习 2：做一个资料编辑表单',
         '练习多字段、分组校验和错误提示布局。',
         ['src/components/ExerciseCard.vue', 'src/style.css'],
@@ -729,7 +1032,7 @@ function validate(form: LoginForm) {
         ['错误提示和字段一一对应', '通过校验后提交成功'],
       ),
       createExercise(
-        'ch8-form-review',
+        'ch9-form-review',
         '练习 3：复盘现有输入交互',
         '把你做过的输入场景整理成状态图。',
         ['docs/LEARNING_PLAN.md'],
@@ -740,9 +1043,9 @@ function validate(form: LoginForm) {
     milestone: '完成标准：你已经能把表单当成状态管理问题来设计，而不是只会绑定输入框。',
   },
   {
-    id: 'chapter-9',
-    order: 9,
-    title: '第九章：视图管理与应用架构',
+    id: 'chapter-10',
+    order: 10,
+    title: '第十章：视图管理与应用架构',
     subtitle: '从学习页面过渡到真实应用的页面组织方式',
     duration: '6 天',
     phase: 'architecture',
@@ -800,7 +1103,7 @@ function validate(form: LoginForm) {
     ],
     exercises: [
       createExercise(
-        'ch9-app-map',
+        'ch10-app-map',
         '练习 1：画一个小型管理台的信息架构图',
         '在动手写代码前先练页面分层。',
         ['docs/LEARNING_PLAN.md'],
@@ -808,7 +1111,7 @@ function validate(form: LoginForm) {
         ['层级关系清楚', '页面职责不互相混淆'],
       ),
       createExercise(
-        'ch9-layout-refactor',
+        'ch10-layout-refactor',
         '练习 2：重做当前课程总览的信息架构',
         '把课程总览从普通首页升级为阶段化课程门户。',
         ['src/views/OverviewView.vue', 'src/style.css'],
@@ -816,7 +1119,7 @@ function validate(form: LoginForm) {
         ['总览不再拥挤', '14 章信息仍然容易定位'],
       ),
       createExercise(
-        'ch9-module-structure',
+        'ch10-module-structure',
         '练习 3：为未来路由化提前调整目录',
         '先做结构准备，不急着全部上路由。',
         ['src/views', 'src/components', 'src/composables'],
@@ -827,9 +1130,129 @@ function validate(form: LoginForm) {
     milestone: '完成标准：你已经能站在应用层设计页面结构，而不是只盯单个组件。',
   },
   {
-    id: 'chapter-10',
-    order: 10,
-    title: '第十章：HTTP 请求、异步数据流与错误处理',
+    id: 'chapter-11',
+    order: 11,
+    title: '第十一章：Vue Router 与多页面导航',
+    subtitle: '让应用拥有真正的页面切换和 URL 管理',
+    duration: '5 天',
+    phase: 'architecture',
+    summary: '这一章解决页面导航问题。当前学习平台用视图切换模拟页面跳转，真实应用需要 URL 驱动的路由系统。',
+    goals: [
+      '理解路由的本质：URL 和页面组件的映射关系',
+      '掌握路由配置、动态路由参数和嵌套路由',
+      '了解导航守卫的基本用法',
+      '理解路由懒加载对性能的意义',
+    ],
+    outcomes: [
+      '能为一个应用设计合理的路由结构',
+      '能实现列表页到详情页的参数传递',
+      '能解释当前项目的视图切换和真实路由的区别',
+    ],
+    starterSteps: [
+      '先理解当前项目的视图切换是怎么做的',
+      '安装 vue-router 并创建最小路由配置',
+      '对比视图切换和路由切换的差异',
+    ],
+    docs: [
+      createDocSection(
+        '路由的本质是 URL 和组件的映射',
+        [
+          '单页应用只有一个 HTML 页面，但用户需要不同的 URL 对应不同的内容。',
+          'Vue Router 的工作就是在 URL 变化时，自动显示对应的组件、隐藏其他组件。',
+          '对 Python 开发者来说，可以类比 Django 的 URLconf，只是执行环境从服务端搬到了浏览器。',
+        ],
+        undefined,
+        [
+          createCode(
+            '最小路由配置',
+            'ts',
+            `import { createRouter, createWebHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: () => import('./views/HomePage.vue') },
+    { path: '/chapters', component: () => import('./views/ChapterList.vue') },
+    { path: '/chapters/:id', component: () => import('./views/ChapterDetail.vue') },
+  ],
+})`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '动态路由和路由参数',
+        [
+          '当页面内容由 ID 决定时（比如章节详情页），就需要动态路由。',
+          '路径中的 `:id` 是参数占位符，组件内通过 `useRoute().params.id` 读取。',
+          '这是列表页→详情页导航的核心机制，几乎所有管理类应用都会用到。',
+        ],
+        undefined,
+        [
+          createCode(
+            '使用路由参数',
+            'vue',
+            `<script setup lang="ts">
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+const route = useRoute()
+const chapterId = computed(() => route.params.id as string)
+</script>`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '导航守卫：在跳转前后执行逻辑',
+        [
+          '有时候你需要在页面跳转前做检查，比如用户是否登录、表单是否保存。',
+          '`beforeEach` 是全局守卫，每次跳转都会触发，适合做权限拦截。',
+          '`beforeRouteLeave` 是组件级守卫，只在离开当前页面时触发，适合做未保存提醒。',
+          '入门阶段不需要把守卫写得很复杂，但要知道它解决什么问题。',
+        ],
+      ),
+      createDocSection(
+        '路由懒加载和当前项目的对比',
+        [
+          '路由配置中使用 `() => import()` 语法，可以让组件在首次访问时才加载，减少首屏体积。',
+          '当前学习平台用 `v-if` 切换视图，好处是简单、不需要引入路由库。',
+          '当页面数量增多、需要浏览器前进后退、需要可分享 URL 时，就应该迁移到路由。',
+          '迁移的过程本身就是一次很好的架构练习。',
+        ],
+        ['当前项目用 v-if 是合理的，因为页面少', '页面超过 5 个且有独立 URL 价值时就应该用路由'],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch11-route-plan',
+        '练习 1：为学习平台设计路由结构',
+        '先在纸面上规划路由，不急着写代码。',
+        ['docs/LEARNING_PLAN.md'],
+        ['列出当前应用的所有页面', '为每个页面设计 URL 路径', '标出哪些页面需要参数、哪些需要嵌套'],
+        ['路由结构清晰', 'URL 语义合理'],
+      ),
+      createExercise(
+        'ch11-minimal-router',
+        '练习 2：创建一个最小路由示例',
+        '在独立分支或临时文件中实践路由基础。',
+        ['src/router/index.ts（新建）', 'src/main.ts'],
+        ['安装 vue-router', '创建路由配置，至少包含 3 个页面', '在 main.ts 中注册路由插件'],
+        ['通过 URL 切换页面', '浏览器前进后退正常工作'],
+      ),
+      createExercise(
+        'ch11-dynamic-route',
+        '练习 3：实现列表页到详情页的参数传递',
+        '练习动态路由参数的传递和使用。',
+        ['src/router/index.ts', 'src/views/ChapterDetail.vue（新建）'],
+        ['定义动态路由 /chapters/:id', '在列表页用 router-link 跳转', '在详情页读取参数并展示对应内容'],
+        ['点击列表项跳转到正确详情', '刷新页面后内容仍然正确'],
+      ),
+    ],
+    milestone: '完成标准：你能用 Vue Router 搭建一个多页面应用，并理解路由和视图切换的差异。',
+  },
+  {
+    id: 'chapter-12',
+    order: 12,
+    title: '第十二章：HTTP 请求与异步数据流',
     subtitle: '让页面真正接入后端，而不是停留在静态数据',
     duration: '6 天',
     phase: 'architecture',
@@ -889,7 +1312,7 @@ function validate(form: LoginForm) {
     ],
     exercises: [
       createExercise(
-        'ch10-request-wrapper',
+        'ch12-request-wrapper',
         '练习 1：封装一个最小请求函数',
         '目标不是造轮子，而是学会把重复逻辑收口。',
         ['src/data/courseContent.ts', 'src/composables/useLocalStorage.ts'],
@@ -897,7 +1320,7 @@ function validate(form: LoginForm) {
         ['成功和失败路径都能跑通', '页面不会静默失败'],
       ),
       createExercise(
-        'ch10-async-state',
+        'ch12-async-state',
         '练习 2：为一个列表设计 loading / empty / error 三态',
         '练习真正的异步 UI 完整度。',
         ['src/views/OverviewView.vue', 'src/style.css'],
@@ -905,7 +1328,7 @@ function validate(form: LoginForm) {
         ['三态都能独立展示', '重试行为可用'],
       ),
       createExercise(
-        'ch10-api-compare',
+        'ch12-api-compare',
         '练习 3：对比一个后端接口契约',
         '从你熟悉的后端接口出发设计前端消费模型。',
         ['docs/LEARNING_PLAN.md'],
@@ -916,9 +1339,123 @@ function validate(form: LoginForm) {
     milestone: '完成标准：你已经能把请求、状态和用户反馈完整串起来。',
   },
   {
-    id: 'chapter-11',
-    order: 11,
-    title: '第十一章：TypeScript 在 Vue 中的高级应用',
+    id: 'chapter-13',
+    order: 13,
+    title: '第十三章：状态管理与 Pinia',
+    subtitle: '从"所有状态堆在 App.vue"到可维护的全局状态',
+    duration: '4 天',
+    phase: 'architecture',
+    summary: '这一章解决跨组件状态共享问题。当前项目把所有状态集中在 App.vue，真实应用需要一个独立的状态管理层。',
+    goals: [
+      '理解为什么组件 props/events 不够用',
+      '掌握 Pinia 的 store、getters 和 actions',
+      '能把 App.vue 中的共享状态迁移到 store',
+    ],
+    outcomes: [
+      '能设计合理的 store 结构',
+      '能在多个组件中共享和修改同一份状态',
+      '能解释什么状态适合放 store，什么状态适合留在组件内',
+    ],
+    starterSteps: [
+      '先盘点 App.vue 中哪些状态被多个视图使用',
+      '安装 Pinia 并创建第一个 store',
+      '对比迁移前后的代码复杂度',
+    ],
+    docs: [
+      createDocSection(
+        '什么时候需要状态管理',
+        [
+          '当多个不相关的组件需要访问同一份数据时，props 逐层传递会变得非常繁琐。',
+          '当前项目的 completedExercises、quizResults 等状态被多个视图消费，这就是典型的跨组件状态。',
+          '状态管理的核心不是技术选型，而是判断哪些状态应该是全局的、哪些应该是局部的。',
+        ],
+        ['被多个视图消费的状态 → 全局 store', '只在单个组件内使用的状态 → 组件内部'],
+      ),
+      createDocSection(
+        'Pinia 的三个核心概念',
+        [
+          '**State**：定义数据，相当于组件里的 `ref` 和 `reactive`。',
+          '**Getters**：定义派生数据，相当于组件里的 `computed`。',
+          '**Actions**：定义修改逻辑，可以包含异步操作，相当于组件里的方法。',
+          '这三者和组件中的响应式系统一一对应，学习成本很低。',
+        ],
+        undefined,
+        [
+          createCode(
+            '定义一个 Store',
+            'ts',
+            `import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useCourseStore = defineStore('course', () => {
+  // state
+  const completedExercises = ref<Record<string, boolean>>({})
+
+  // getter
+  const completedCount = computed(() =>
+    Object.values(completedExercises.value).filter(Boolean).length,
+  )
+
+  // action
+  function toggleExercise(id: string) {
+    completedExercises.value[id] = !completedExercises.value[id]
+  }
+
+  return { completedExercises, completedCount, toggleExercise }
+})`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '从 App.vue 迁移到 Store 的策略',
+        [
+          '不要试图一次性把所有状态都迁移，先选一个最简单的状态练手。',
+          '迁移步骤：定义 store → 组件中引用 store → 移除 props/events → 验证功能不变。',
+          '迁移后你会发现 App.vue 变瘦了，组件之间的依赖关系也更清晰。',
+        ],
+        ['先迁移最简单的状态', '逐步替换，每步验证'],
+      ),
+      createDocSection(
+        'Store 和 localStorage 的配合',
+        [
+          'Pinia 默认不会持久化到 localStorage，页面刷新后状态会丢失。',
+          '可以通过 Pinia 插件实现自动持久化，或者继续在组件中用 watch 同步。',
+          '对于学习项目，保留现有的 useLocalStorage composable 并在 store 中使用它是最简单的方案。',
+        ],
+      ),
+    ],
+    exercises: [
+      createExercise(
+        'ch13-first-store',
+        '练习 1：创建第一个 Pinia Store',
+        '把练习完成状态从 App.vue 迁移到独立 store。',
+        ['src/stores/courseStore.ts（新建）', 'src/main.ts'],
+        ['安装 pinia 并在 main.ts 注册', '创建 store，把 completedExercises 搬进去', '在一个组件中使用 store 替代 props'],
+        ['store 定义清楚', '组件通过 store 读写状态'],
+      ),
+      createExercise(
+        'ch13-multi-component',
+        '练习 2：让两个组件共享同一个 Store',
+        '验证多个组件操作同一份状态时的同步效果。',
+        ['src/stores/courseStore.ts', 'src/components/ExerciseCard.vue', 'src/components/AppHeader.vue'],
+        ['在 ExerciseCard 中通过 store 标记完成', '在 AppHeader 中通过 store 读取进度', '验证一处修改另一处实时更新'],
+        ['进度数据一致', '不通过 props 传递也能同步'],
+      ),
+      createExercise(
+        'ch13-scope-review',
+        '练习 3：判断状态应该放哪里',
+        '培养状态归属的判断能力。',
+        ['docs/LEARNING_PLAN.md'],
+        ['列出 App.vue 中所有状态', '按全局/局部分类', '说明每个状态应该放 store 还是留在组件内'],
+        ['分类依据清楚', '能解释为什么某些状态不适合全局化'],
+      ),
+    ],
+    milestone: '完成标准：你能用 Pinia 管理跨组件状态，并且知道什么状态该放 store、什么该留在组件。',
+  },
+  {
+    id: 'chapter-14',
+    order: 14,
+    title: '第十四章：TypeScript 在 Vue 中的高级应用',
     subtitle: '让类型真正参与组件契约、请求模型和业务状态设计',
     duration: '6 天',
     phase: 'architecture',
@@ -984,7 +1521,7 @@ function validate(form: LoginForm) {
     ],
     exercises: [
       createExercise(
-        'ch11-typed-events',
+        'ch14-typed-events',
         '练习 1：为核心组件补齐事件类型',
         '让交互边界更明确。',
         ['src/components/QuizPanel.vue', 'src/components/ChapterSidebar.vue'],
@@ -992,7 +1529,7 @@ function validate(form: LoginForm) {
         ['事件签名清楚', '调用处补全更可靠'],
       ),
       createExercise(
-        'ch11-page-state',
+        'ch14-page-state',
         '练习 2：用判别联合重写一个页面状态',
         '不要只用字符串，给每种状态配上所需数据。',
         ['src/views/ResourcesView.vue'],
@@ -1000,7 +1537,7 @@ function validate(form: LoginForm) {
         ['模板分支更清楚', '空值判断减少'],
       ),
       createExercise(
-        'ch11-request-types',
+        'ch14-request-types',
         '练习 3：为一个分页接口设计泛型类型',
         '把数据契约和列表页面结合起来。',
         ['src/types/course.ts'],
@@ -1011,9 +1548,9 @@ function validate(form: LoginForm) {
     milestone: '完成标准：你已经能让类型参与组件契约和业务状态设计，而不是只给变量标注类型。',
   },
   {
-    id: 'chapter-12',
-    order: 12,
-    title: '第十二章：样式工程化、设计系统与动效',
+    id: 'chapter-15',
+    order: 15,
+    title: '第十五章：样式工程化、设计系统与动效',
     subtitle: '把页面从能看提升到有秩序、有节奏、可复用',
     duration: '5 天',
     phase: 'production',
@@ -1071,7 +1608,7 @@ function validate(form: LoginForm) {
     ],
     exercises: [
       createExercise(
-        'ch12-design-tokens',
+        'ch15-design-tokens',
         '练习 1：梳理一套页面设计变量',
         '先统一基础变量，再谈组件风格。',
         ['src/style.css'],
@@ -1079,7 +1616,7 @@ function validate(form: LoginForm) {
         ['样式变量更统一', '重复值明显减少'],
       ),
       createExercise(
-        'ch12-phase-visual',
+        'ch15-phase-visual',
         '练习 2：为四个阶段设计清晰视觉区分',
         '让用户一眼知道自己处在哪个阶段。',
         ['src/style.css', 'src/views/OverviewView.vue'],
@@ -1087,7 +1624,7 @@ function validate(form: LoginForm) {
         ['阶段识别度高', '整体视觉仍然统一'],
       ),
       createExercise(
-        'ch12-mobile-review',
+        'ch15-mobile-review',
         '练习 3：专门检查移动端课程页',
         '移动端是课程类产品最容易忽视的阅读场景。',
         ['src/style.css'],
@@ -1098,14 +1635,19 @@ function validate(form: LoginForm) {
     milestone: '完成标准：你已经能用设计变量和信息层级来组织样式，而不是只会零散调颜色。',
   },
   {
-    id: 'chapter-13',
-    order: 13,
-    title: '第十三章：性能优化、测试策略与调试技巧',
+    id: 'chapter-16',
+    order: 16,
+    title: '第十六章：性能优化、测试与调试',
     subtitle: '会写还不够，还要会验证、会排错、会守住回归',
-    duration: '6 天',
+    duration: '7 天',
     phase: 'production',
-    summary: '这一章让你补齐交付能力。重点不是追求极限优化，而是知道何时该测、测什么、怎么查性能和状态问题。',
-    goals: ['建立基础性能分析和优化意识', '知道单元测试、组件测试和人工回归各自适用场景', '掌握常见的 Vue 调试路径'],
+    summary: '这一章让你补齐交付能力。重点不是追求极限优化，而是知道何时该测、测什么、怎么查性能和状态问题，以及如何用 vitest 写实际测试。',
+    goals: [
+      '建立基础性能分析和优化意识',
+      '知道单元测试、组件测试和人工回归各自适用场景',
+      '掌握常见的 Vue 调试路径',
+      '能用 vitest 写基础的单元测试和组件测试',
+    ],
     outcomes: ['能分析渲染过多、状态错乱、接口失败等问题', '能为关键逻辑设计最小验证策略'],
     starterSteps: ['先从最常见的性能问题和回归点开始', '用构建、控制台、网络面板和 Vue Devtools 组合排查', '不要一上来就追逐微优化'],
     docs: [
@@ -1154,10 +1696,63 @@ function validate(form: LoginForm) {
           '成熟开发者和新手的差距，很多时候不在于有没有遇到 bug，而在于有没有形成复盘模型。',
         ],
       ),
+      createDocSection(
+        '用 vitest 写实际的自动化测试',
+        [
+          '学习项目虽然不大，但核心逻辑（进度统计、状态持久化、筛选计算）完全值得写测试保护。',
+          'vitest 是 Vite 生态的标准测试框架，配置简单、执行快速，和项目现有的构建体系无缝衔接。',
+          '入门阶段不需要追求覆盖率，但至少要为核心 composable 和工具函数写几个测试。',
+        ],
+        ['先测纯函数和 composable，再考虑组件测试', '测试命名用"当...时应该..."的格式'],
+        [
+          createCode(
+            'vitest 测试示例',
+            'ts',
+            `import { describe, it, expect } from 'vitest'
+
+describe('进度计算', () => {
+  it('当没有完成任何练习时，进度应为 0%', () => {
+    const progress = calculateProgress(0, 14)
+    expect(progress).toBe(0)
+  })
+
+  it('当完成一半练习时，进度应为 50%', () => {
+    const progress = calculateProgress(7, 14)
+    expect(progress).toBe(50)
+  })
+})`,
+          ),
+        ],
+      ),
+      createDocSection(
+        '测试 composable 的基本方式',
+        [
+          'composable 是最容易测试的部分，因为它们通常不依赖 DOM。',
+          '在测试中通过 `setup` 辅助函数创建响应式上下文，然后断言返回值的计算结果。',
+          '这是投入产出比最高的测试类型，优先覆盖所有 composable。',
+        ],
+        undefined,
+        [
+          createCode(
+            '测试 useLocalStorage composable',
+            'ts',
+            `import { describe, it, expect, beforeEach } from 'vitest'
+
+beforeEach(() => {
+  localStorage.clear()
+})
+
+it('应该使用初始值', () => {
+  const { data } = useLocalStorage('test-key', '默认值')
+  expect(data.value).toBe('默认值')
+})`,
+          ),
+        ],
+      ),
     ],
     exercises: [
       createExercise(
-        'ch13-debug-flow',
+        'ch16-debug-flow',
         '练习 1：写出你的固定排错路径',
         '把模糊经验固化成可执行步骤。',
         ['docs/LEARNING_PLAN.md'],
@@ -1165,7 +1760,7 @@ function validate(form: LoginForm) {
         ['路径可执行', '不是停留在“多试试”层面'],
       ),
       createExercise(
-        'ch13-regression-check',
+        'ch16-regression-check',
         '练习 2：整理课程平台的关键回归清单',
         '把重要交互列出来，防止改版后无声回归。',
         ['TODO.md'],
@@ -1173,20 +1768,28 @@ function validate(form: LoginForm) {
         ['清单覆盖核心路径', '每项都可验证'],
       ),
       createExercise(
-        'ch13-perf-review',
+        'ch16-perf-review',
         '练习 3：检查一个可能的过度渲染点',
         '练习从结构角度看性能。',
         ['src/views/OverviewView.vue', 'src/views/ChapterView.vue'],
         ['选一个复杂视图', '找出可能重复计算或重复渲染的区域', '记录你会如何优化以及为什么'],
         ['结论有依据', '不是拍脑袋优化'],
       ),
+      createExercise(
+        'ch16-vitest-setup',
+        '练习 4：安装 vitest 并写第一个测试',
+        '动手搭建测试环境，为核心计算逻辑写测试。',
+        ['vitest.config.ts（新建）', 'src/composables/__tests__/useLocalStorage.test.ts（新建）'],
+        ['安装 vitest', '配置 vitest.config.ts', '为 useLocalStorage composable 写至少 2 个测试用例'],
+        ['测试运行通过', '能解释每个测试在验证什么'],
+      ),
     ],
-    milestone: '完成标准：你已经具备基本的验证、排错和性能判断能力，而不是只会继续写功能。',
+    milestone: '完成标准：你具备基本的验证、排错和性能判断能力，并能为核心逻辑写自动化测试。',
   },
   {
-    id: 'chapter-14',
-    order: 14,
-    title: '第十四章：项目实战，构建完整的前端应用',
+    id: 'chapter-17',
+    order: 17,
+    title: '第十七章：项目实战，构建完整的前端应用',
     subtitle: '把前面十三章的知识收束到一个可展示、可交付的作品',
     duration: '10 天',
     phase: 'production',
@@ -1233,6 +1836,31 @@ function validate(form: LoginForm) {
         ],
       ),
       createDocSection(
+        '构建产物和部署基础',
+        [
+          '`npm run build` 会生成 `dist/` 目录，里面是优化后的静态文件（HTML、JS、CSS）。',
+          '部署就是把 `dist/` 目录放到 Web 服务器上。常见选择：Nginx、Vercel、Netlify、GitHub Pages。',
+          '环境变量（`.env` 文件）用于区分开发和生产环境，`VITE_` 前缀的变量会被注入到前端代码中。',
+          '对 Python 开发者来说，这相当于 Django 的 `collectstatic` + WSGI 部署，只是前端更简单。',
+        ],
+        undefined,
+        [
+          createCode(
+            '部署前检查清单',
+            'bash',
+            `# 1. 确认构建成功
+npm run build
+
+# 2. 本地预览构建产物
+npm run preview
+
+# 3. 环境变量（如有）
+# .env.production
+VITE_API_BASE=https://api.example.com`,
+          ),
+        ],
+      ),
+      createDocSection(
         '课程终点其实是新起点',
         [
           '完成这套课程后，你不会立刻变成资深前端，但你已经拥有独立交付小型 Vue 项目的能力框架。',
@@ -1243,7 +1871,7 @@ function validate(form: LoginForm) {
     ],
     exercises: [
       createExercise(
-        'ch14-project-scope',
+        'ch17-project-scope',
         '练习 1：定义你的实战项目范围',
         '控制范围是项目成功的一半。',
         ['docs/LEARNING_PLAN.md'],
@@ -1251,7 +1879,7 @@ function validate(form: LoginForm) {
         ['项目目标清楚', '范围没有失控'],
       ),
       createExercise(
-        'ch14-build-demo',
+        'ch17-build-demo',
         '练习 2：完成一个可演示版本',
         '不是做完所有想法，而是先交付一个能演示的版本。',
         ['src/App.vue', 'src/views', 'src/components', 'src/style.css'],
@@ -1259,7 +1887,7 @@ function validate(form: LoginForm) {
         ['项目可运行可讲解', '核心流程完整'],
       ),
       createExercise(
-        'ch14-retro',
+        'ch17-retro',
         '练习 3：写最终复盘',
         '把课程学习沉淀成自己的方法论。',
         ['README.md'],

@@ -82,55 +82,7 @@ function submitQuiz(chapterId: string, result: QuizResult) {
 function retryQuiz(_chapterId: string) {
 }
 
-function exportProgress() {
-  const data = {
-    completedExercises: completedExercises.value,
-    chapterNotes: chapterNotes.value,
-    quizResults: quizResults.value,
-    exportedAt: new Date().toISOString(),
-  }
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = 'vue-learning-progress.json'
-  document.body.appendChild(anchor)
-  anchor.click()
-  document.body.removeChild(anchor)
-  URL.revokeObjectURL(url)
-}
-
-function importProgress(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onload = (loadEvent) => {
-    try {
-      const data = JSON.parse(loadEvent.target?.result as string)
-
-      if (data.completedExercises && typeof data.completedExercises === 'object') {
-        completedExercises.value = data.completedExercises
-      }
-
-      if (data.chapterNotes && typeof data.chapterNotes === 'object') {
-        chapterNotes.value = data.chapterNotes
-      }
-
-      if (data.quizResults && typeof data.quizResults === 'object') {
-        quizResults.value = data.quizResults
-      }
-    } catch {
-      alert('导入失败，请选择之前导出的 JSON 进度文件。')
-    }
-  }
-
-  reader.readAsText(file)
-  input.value = ''
-}
 </script>
 
 <template>
@@ -180,8 +132,6 @@ function importProgress(event: Event) {
           :passed-quiz-count="passedQuizCount"
           :total-quiz-count="chapterQuizzes.length"
           @open-chapter="openChapter"
-          @export-progress="exportProgress"
-          @import-progress="importProgress"
         />
         <ResourcesView v-else :resources="learningResources" :phases="learningPhases" />
       </main>

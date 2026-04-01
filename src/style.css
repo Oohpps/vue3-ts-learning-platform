@@ -5,19 +5,19 @@
    ======================================== */
 :root {
   /* Primary */
-  --c-primary: #0D9488;
-  --c-primary-hover: #0F766E;
-  --c-primary-light: #CCFBF1;
-  --c-primary-bg: #F0FDFA;
+  --c-primary: #6366F1;
+  --c-primary-hover: #4F46E5;
+  --c-primary-light: #E0E7FF;
+  --c-primary-bg: #EEF2FF;
 
   /* Accent */
   --c-accent: #F97316;
   --c-accent-light: #FFF7ED;
 
   /* Phase colors */
-  --c-phase-1: #3B82F6;
-  --c-phase-1-light: #EFF6FF;
-  --c-phase-1-bg: #DBEAFE;
+  --c-phase-1: #0EA5E9;
+  --c-phase-1-light: #F0F9FF;
+  --c-phase-1-bg: #E0F2FE;
   --c-phase-2: #8B5CF6;
   --c-phase-2-light: #F5F3FF;
   --c-phase-2-bg: #EDE9FE;
@@ -183,7 +183,7 @@ strong {
   height: 36px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--c-primary) 0%, #0F766E 100%);
+  background: linear-gradient(135deg, var(--c-primary) 0%, #4F46E5 100%);
   color: white;
   font-family: var(--font-heading);
   font-weight: 700;
@@ -284,7 +284,7 @@ strong {
   gap: 32px;
   align-items: center;
   padding: 44px;
-  background: linear-gradient(135deg, #0D9488 0%, #0F766E 40%, #115E59 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 40%, #3730A3 100%);
   border-radius: var(--r-xl);
   color: white;
   margin-bottom: 32px;
@@ -427,8 +427,8 @@ strong {
 }
 
 .highlight-card {
-  background: linear-gradient(135deg, #F0FDFA, #CCFBF1);
-  border-color: rgba(13, 148, 136, 0.15);
+  background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+  border-color: rgba(99, 102, 241, 0.15);
   box-shadow: var(--shadow-sm);
 }
 
@@ -442,10 +442,16 @@ strong {
 .chapter-preview-card {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 12px;
+  padding: 20px 20px 20px 24px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
 }
 
 .chapter-preview-card::before {
@@ -483,7 +489,7 @@ strong {
 .chapter-preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .roadmap-strip {
@@ -683,7 +689,7 @@ strong {
   min-width: 160px;
   padding: 18px;
   border-radius: var(--r-lg);
-  background: linear-gradient(135deg, var(--c-primary) 0%, #0F766E 100%);
+  background: linear-gradient(135deg, var(--c-primary) 0%, #4F46E5 100%);
   color: white;
   flex-shrink: 0;
   box-shadow: var(--shadow-md);
@@ -1241,7 +1247,7 @@ strong {
 .note-box textarea:focus {
   outline: none;
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* ========================================
@@ -1641,7 +1647,7 @@ strong {
 
 .overview-focus {
   background:
-    radial-gradient(circle at top right, rgba(13, 148, 136, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 28%),
     var(--c-surface);
 }
 

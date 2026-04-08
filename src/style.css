@@ -68,8 +68,8 @@
 
   /* Layout */
   --nav-h: 64px;
-  --max-w: 1200px;
-  --sidebar-w: 300px;
+  --max-w: 1920px;
+  --sidebar-w: clamp(280px, 18vw, 360px);
 
   /* Radii */
   --r-sm: 8px;
@@ -162,7 +162,7 @@ strong {
 }
 
 .top-bar-inner {
-  max-width: var(--max-w);
+  width: min(calc(100vw - 32px), var(--max-w));
   margin: 0 auto;
   padding: 0 24px;
   height: var(--nav-h);
@@ -259,19 +259,19 @@ strong {
    Main Content Area
    ======================================== */
 .main-content {
-  max-width: var(--max-w);
+  width: min(calc(100vw - 32px), var(--max-w));
   margin: 0 auto;
   padding: 40px 24px 80px;
 }
 
 /* Chapter Layout: Sidebar + Content */
 .chapter-layout {
-  max-width: var(--max-w);
+  width: min(calc(100vw - 32px), var(--max-w));
   margin: 0 auto;
   padding: 32px 24px 80px;
   display: grid;
-  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1.35fr);
+  gap: 32px;
   align-items: start;
 }
 
@@ -482,7 +482,7 @@ strong {
 .goal-grid,
 .roadmap-guide {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -500,7 +500,7 @@ strong {
 
 .resource-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -916,7 +916,7 @@ strong {
 
 .exercise-columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -1659,6 +1659,22 @@ strong {
 
 .phase-roadmap.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 1600px) {
+  .overview-hero {
+    grid-template-columns: minmax(0, 1.3fr) minmax(320px, 420px);
+    gap: 40px;
+  }
+
+  .chapter-preview-grid {
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  }
+
+  .roadmap-strip,
+  .phase-roadmap {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .phase-card {
